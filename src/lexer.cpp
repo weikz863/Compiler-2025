@@ -180,21 +180,20 @@ std::vector<Token> lex(const std::string_view &input) {
   std::vector<Token> tokens;
   size_t i = 0;
   while (i < input.size()) {
-    if (std::isspace(input[i])) {
-      ++i;
-      continue;
-    }
-    tokens.push_back(Token());
+    Token token;
     for (auto type: Token::types) {
-      auto token = try_lex(input.substr(i), type);
-      if (token.value.size() > tokens.back().value.size()) {
-        tokens.back() = token;
+      auto t = try_lex(input.substr(i), type);
+      if (t.value.size() > token.value.size()) {
+        token = t;
       }
     }
-    if (tokens.back().value.empty()) {
+    if (token.value.empty()) {
       throw LexerError("Failed to lex token at position " + std::to_string(i));
     }
-    i += tokens.back().value.size();
+    i += token.value.size();
+    if (token.type != Token::Type::Whitespace && token.type != Token::Type::Comment) {
+      tokens.push_back(token);
+    }
   }
   return tokens;
 }
