@@ -4,7 +4,8 @@
 #include <set>
 #include <array>
 
-constexpr std::set<std::string> keywords{
+/* cannot be constexpr */
+const std::set<std::string> keywords{
   "as", "break", "const", "continue", "crate", "else", "enum", "false", "fn", "for", "if", "impl", "in", "let",
   "loop", "match", "mod", "move", "mut", "pub", "ref", "return", "self", "Self", "static", "struct", "super",
   "trait", "true", "type", "unsafe", "use", "where", "while", "dyn"
@@ -64,6 +65,14 @@ std::pair<char, int> read_characters(const std::string_view &input) {
 
 class Token {
  public:
+  enum class Type {
+    Identifier,
+    Keyword,
+    CharLiteral,
+    StringLiteral,
+    IntegerLiteral,
+    Punctuation,
+  };
   Token() = default;
   Token(Type t) : type{t}, value{} {}
   void read_from(const std::string_view &input) {
@@ -140,15 +149,8 @@ class Token {
       }
     }
   }
-  enum class Type {
-    Identifier,
-    Keyword,
-    CharLiteral,
-    StringLiteral,
-    IntegerLiteral,
-    Punctuation,
-  } type;
-  constexpr std::array<Type, 6> types = {
+  Type type;
+  constexpr static std::array<Type, 6> types = {
     Type::Identifier, Type::Keyword, Type::CharLiteral, Type::StringLiteral, Type::IntegerLiteral, Type::Punctuation
   };
   std::string value;

@@ -12,15 +12,20 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(googletest)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_library(my_library src/lexer.cpp)
+
 enable_testing()
 
 add_executable(
   lexer_test
   tests/lexer_test.cpp
 )
+
 target_link_libraries(
   lexer_test
-  GTest::gtest_main
+  my_library
+  gtest_main
 )
 
 include(GoogleTest)
