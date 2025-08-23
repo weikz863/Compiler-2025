@@ -19,9 +19,12 @@ class Token {
     StringLiteral,
     IntegerLiteral,
     Punctuation,
+    Whitespace,
+    Comment,
   };
-  constexpr static std::array<Type, 6> types = {
-    Type::Identifier, Type::Keyword, Type::CharLiteral, Type::StringLiteral, Type::IntegerLiteral, Type::Punctuation
+  constexpr static std::array<Type, 8> types = {
+    Type::Identifier, Type::Keyword, Type::CharLiteral, Type::StringLiteral,
+    Type::IntegerLiteral, Type::Punctuation, Type::Whitespace, Type::Comment
   };
   Token();
   Token(Type t);

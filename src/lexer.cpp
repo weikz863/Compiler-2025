@@ -131,6 +131,40 @@ void Token::read_from(const std::string_view &input) {
       }
       break;
     }
+    case Type::Whitespace: { // added by copilot
+      for (char c: input) {
+        if (std::isspace(c)) {
+          value.push_back(c);
+        } else {
+          break;
+        }
+      }
+      break;
+    }
+    case Type::Comment: { // added by copilot
+      if (input.starts_with("//")) {
+        size_t i = 2;
+        while (i < input.size() && input[i] != '\n') {
+          ++i;
+        }
+        value = std::string(input.substr(0, i));
+      } else if (input.starts_with("/*")) {
+        size_t i = 2, nested = 1;
+        while (i < input.size() && nested > 0) {
+          if (i + 1 < input.size() && input[i] == '/' && input[i + 1] == '*') {
+            ++nested;
+            i += 2;
+          } else if (i + 1 < input.size() && input[i] == '*' && input[i + 1] == '/') {
+            --nested;
+            i += 2;
+          } else {
+            ++i;
+          }
+        }
+        value = std::string(input.substr(0, i));
+      }
+      break;
+    }
   }
 }
 
