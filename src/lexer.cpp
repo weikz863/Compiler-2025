@@ -162,7 +162,7 @@ void Token::read_from(const std::string_view &input) {
           }
         }
         if (nested != 0) {
-          throw LexerError("Unterminated comment");
+          throw LexerError("Unterminated comment"); // this is specifically for unterminated comment
         }
         value = std::string(input.substr(0, i));
       }
