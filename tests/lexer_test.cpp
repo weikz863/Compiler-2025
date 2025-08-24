@@ -137,3 +137,145 @@ if x > 10 {
     EXPECT_EQ(tokens[i].type, expected_types[i]);
   }
 }
+
+TEST(LexerTest, CommentLex) {
+  string input = R"(let x = 42; // This is a comment
+let y = x + 1; /* This is a
+multi-line comment */
+let z = y * 2;)";
+  auto tokens = lex(input);
+  std::vector<string> expected_values = {
+    "let", "x", "=", "42", ";",
+    "let", "y", "=", "x", "+", "1", ";",
+    "let", "z", "=", "y", "*", "2", ";"
+  };
+  std::vector<Token::Type> expected_types = {
+    Token::Type::Keyword, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::IntegerLiteral, Token::Type::Punctuation,
+    Token::Type::Keyword, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::IntegerLiteral, Token::Type::Punctuation,
+    Token::Type::Keyword, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::IntegerLiteral, Token::Type::Punctuation
+  };
+  ASSERT_EQ(tokens.size(), expected_types.size());
+  ASSERT_EQ(tokens.size(), expected_values.size());
+  for (size_t i = 0; i < tokens.size(); ++i) {
+    EXPECT_EQ(tokens[i].value, expected_values[i]);
+    EXPECT_EQ(tokens[i].type, expected_types[i]);
+  }
+}
+
+TEST(LexerTest, NestedCommentLex) {
+  string input = R"(let x = 42; /* This is a /* nested */ comment */ let y = x + 1;)";
+  auto tokens = lex(input);
+  std::vector<string> expected_values = {
+    "let", "x", "=", "42", ";",
+    "let", "y", "=", "x", "+", "1", ";"
+  };
+  std::vector<Token::Type> expected_types = {
+    Token::Type::Keyword, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::IntegerLiteral, Token::Type::Punctuation,
+    Token::Type::Keyword, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::IntegerLiteral, Token::Type::Punctuation
+  };
+  ASSERT_EQ(tokens.size(), expected_types.size());
+  ASSERT_EQ(tokens.size(), expected_values.size());
+  for (size_t i = 0; i < tokens.size(); ++i) {
+    EXPECT_EQ(tokens[i].value, expected_values[i]);
+    EXPECT_EQ(tokens[i].type, expected_types[i]);
+  }
+}
+
+TEST(LexerTest, NestedCommentLex2) {
+  string input = R"(let x = 42; /* This is another // comment */ let y = x + 1;)";
+  auto tokens = lex(input);
+  std::vector<string> expected_values = {
+    "let", "x", "=", "42", ";",
+    "let", "y", "=", "x", "+", "1", ";"
+  };
+  std::vector<Token::Type> expected_types = {
+    Token::Type::Keyword, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::IntegerLiteral, Token::Type::Punctuation,
+    Token::Type::Keyword, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::IntegerLiteral, Token::Type::Punctuation
+  };
+  ASSERT_EQ(tokens.size(), expected_types.size());
+  ASSERT_EQ(tokens.size(), expected_values.size());
+  for (size_t i = 0; i < tokens.size(); ++i) {
+    EXPECT_EQ(tokens[i].value, expected_values[i]);
+    EXPECT_EQ(tokens[i].type, expected_types[i]);
+  }
+}
+
+TEST(LexerTest, NestedCommentLex3) {
+  string input = R"(let x = 42; // This is another /* comment */ let y = x + 1;)";
+  auto tokens = lex(input);
+  std::vector<string> expected_values = {
+    "let", "x", "=", "42", ";",
+  };
+  std::vector<Token::Type> expected_types = {
+    Token::Type::Keyword, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::IntegerLiteral, Token::Type::Punctuation,
+  };
+  ASSERT_EQ(tokens.size(), expected_types.size());
+  ASSERT_EQ(tokens.size(), expected_values.size());
+  for (size_t i = 0; i < tokens.size(); ++i) {
+    EXPECT_EQ(tokens[i].value, expected_values[i]);
+    EXPECT_EQ(tokens[i].type, expected_types[i]);
+  }
+}
+
+TEST(LexerTest, NestedCommentLex4) {
+  string input = R"(let x = 42; /* This is a /* nested */ comment // with single line comment */ let y = x + 1;)";
+  auto tokens = lex(input);
+  std::vector<string> expected_values = {
+    "let", "x", "=", "42", ";",
+    "let", "y", "=", "x", "+", "1", ";"
+  };
+  std::vector<Token::Type> expected_types = {
+    Token::Type::Keyword, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::IntegerLiteral, Token::Type::Punctuation,
+    Token::Type::Keyword, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::IntegerLiteral, Token::Type::Punctuation
+  };
+  ASSERT_EQ(tokens.size(), expected_types.size());
+  ASSERT_EQ(tokens.size(), expected_values.size());
+  for (size_t i = 0; i < tokens.size(); ++i) {
+    EXPECT_EQ(tokens[i].value, expected_values[i]);
+    EXPECT_EQ(tokens[i].type, expected_types[i]);
+  }
+}
+
+TEST(LexerTest, CommentInStringLex) {
+  string input = R"(let s = "This is not a // comment"; let t = "This is not a /* comment */ either";)";
+  auto tokens = lex(input);
+  std::vector<string> expected_values = {
+    "let", "s", "=", "\"This is not a // comment\"", ";",
+    "let", "t", "=", "\"This is not a /* comment */ either\"", ";"
+  };
+  std::vector<Token::Type> expected_types = {
+    Token::Type::Keyword, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::StringLiteral, Token::Type::Punctuation,
+    Token::Type::Keyword, Token::Type::Identifier, Token::Type::Punctuation, Token::Type::StringLiteral, Token::Type::Punctuation
+  };
+  ASSERT_EQ(tokens.size(), expected_types.size());
+  ASSERT_EQ(tokens.size(), expected_values.size());
+  for (size_t i = 0; i < tokens.size(); ++i) {
+    EXPECT_EQ(tokens[i].value, expected_values[i]);
+    EXPECT_EQ(tokens[i].type, expected_types[i]);
+  }
+}
+
+TEST(LexerThrowTest, UnterminatedStringLiteral) {
+  string input = R"(let s = "This is an unterminated string;)";
+  EXPECT_THROW(lex(input), LexerError);
+}
+
+TEST(LexerThrowTest, UnterminatedCharLiteral) {
+  string input = R"(let c = 'a;)";
+  EXPECT_THROW(lex(input), LexerError);
+}
+
+TEST(LexerThrowTest, UnterminatedComment) {
+  string input = R"(let x = 42; /* This is an unterminated comment )";
+  EXPECT_THROW(lex(input), LexerError);
+}
+
+TEST(LexerThrowTest, InvalidEscapeInCharLiteral) {
+  string input = R"(let c = '\x12';)";
+  EXPECT_THROW(lex(input), LexerError);
+}
+
+TEST(LexerThrowTest, InvalidEscapeInStringLiteral) {
+  string input = R"(let s = "This is an invalid escape: \x12";)";
+  EXPECT_THROW(lex(input), LexerError);
+}
