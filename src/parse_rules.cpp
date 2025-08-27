@@ -188,7 +188,29 @@ const std::array<std::vector<std::vector<std::variant<Token, Nonterminal>>>, 1> 
       Token(Token::Type::Punctuation, "{"), Nonterminal::ITEMS, 
       Token(Token::Type::Punctuation, "}") }
   },
-
+  // 30. STATEMENT -> ";" | ITEM | LET_STATEMENT | EXPRESSION_STATEMENT
+  {
+    { Token(Token::Type::Punctuation, ";") },
+    { Nonterminal::ITEM },
+    { Nonterminal::LET_STATEMENT },
+    { Nonterminal::EXPRESSION_STATEMENT }
+  },
+  // 31. LET_STATEMENT -> "let" PATTERN ":" TYPE ("=" EXPRESSION)? ";"
+  {
+    { Token(Token::Type::Keyword, "let"), Nonterminal::PATTERN, 
+      Token(Token::Type::Punctuation, ":"), Nonterminal::TYPE, 
+      Token(Token::Type::Punctuation, "="), Nonterminal::EXPRESSION, 
+      Token(Token::Type::Punctuation, ";") },
+    { Token(Token::Type::Keyword, "let"), Nonterminal::PATTERN, 
+      Token(Token::Type::Punctuation, ":"), Nonterminal::TYPE, 
+      Token(Token::Type::Punctuation, ";") }
+  },
+  // 32. EXPRESSION_STATEMENT -> EXPRESSION_WITHOUT_BLOCK ";" | EXPRESSION_WITH_BLOCK ";"?
+  {
+    { Nonterminal::EXPRESSION_WITHOUT_BLOCK, Token(Token::Type::Punctuation, ";") },
+    { Nonterminal::EXPRESSION_WITH_BLOCK, Token(Token::Type::Punctuation, ";") },
+    { Nonterminal::EXPRESSION_WITH_BLOCK }
+  },
 
   // TYPE -> TYPE_PATH | REFERENCE_TYPE | ARRAY_TYPE | UNIT_TYPE
   {

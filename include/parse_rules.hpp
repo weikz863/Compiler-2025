@@ -34,6 +34,9 @@ enum class Nonterminal {
   IMPLEMENTATION,
     INHERENT_IMPL,
     TRAIT_IMPL,
+  STATEMENT,
+    LET_STATEMENT,
+    EXPRESSION_STATEMENT,
 };
 
 #endif
