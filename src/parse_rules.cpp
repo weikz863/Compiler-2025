@@ -211,55 +211,9 @@ const std::array<std::vector<std::vector<std::variant<Token, Nonterminal>>>, 1> 
     { Nonterminal::EXPRESSION_WITH_BLOCK, Token(Token::Type::Punctuation, ";") },
     { Nonterminal::EXPRESSION_WITH_BLOCK }
   },
-
-  // TYPE -> TYPE_PATH | REFERENCE_TYPE | ARRAY_TYPE | UNIT_TYPE
+  // 33. EXPRESSION -> EXPRESSION_WITHOUT_BLOCK | EXPRESSION_WITH_BLOCK
   {
-    { Nonterminal::TYPE_PATH },
-    { Nonterminal::REFERENCE_TYPE },
-    { Nonterminal::ARRAY_TYPE },
-    { Nonterminal::UNIT_TYPE }
+    { Nonterminal::EXPRESSION_WITHOUT_BLOCK },
+    { Nonterminal::EXPRESSION_WITH_BLOCK }
   },
-  // TYPE_PATH -> Identifier | "Self" | "self"
-  {
-    { Token(Token::Type::Identifier) },
-    { Token(Token::Type::Keyword, "Self") },
-    { Token(Token::Type::Keyword, "self") }
-  },
-  // REFERENCE_TYPE -> "&" OPTIONAL_MUT TYPE
-  {
-    { Token(Token::Type::Punctuation, "&"), Nonterminal::OPTIONAL_MUT, Nonterminal::TYPE }
-  },
-  // ARRAY_TYPE -> "[" TYPE ";" EXPRESSION "]"
-  {
-    { Token(Token::Type::Punctuation, "["), Nonterminal::TYPE, 
-      Token(Token::Type::Punctuation, ";"), Nonterminal::EXPRESSION, 
-      Token(Token::Type::Punctuation, "]") }
-  },
-  // EXPRESSION -> EXPRESSION_WITH_BLOCK | EXPRESSION_WITHOUT_BLOCK
-  {
-    { Nonterminal::EXPRESSION_WITH_BLOCK },
-    { Nonterminal::EXPRESSION_WITHOUT_BLOCK }
-  },
-  // EXPRESSION_WITHOUT_BLOCK -> LITERAL_EXPRESSION | PATH_EXPRESSION | OPERATOR_EXPRESSION |
-  //                            GROUPED_EXPRESSION | ARRAY_EXPRESSION | INDEX_EXPRESSION |
-  //                            STRUCT_EXPRESSION | CALL_EXPRESSION | METHOD_CALL_EXPRESSION |
-  //                            FIELD_EXPRESSION | CONTINUE_EXPRESSION | BREAK_EXPRESSION |
-  //                            RETURN_EXPRESSION | UNDERSCORE_EXPRESSION
-  {
-    { Nonterminal::LITERAL_EXPRESSION },
-    { Nonterminal::PATH_EXPRESSION },
-    { Nonterminal::OPERATOR_EXPRESSION },
-    { Nonterminal::GROUPED_EXPRESSION },
-    { Nonterminal::ARRAY_EXPRESSION },
-    { Nonterminal::INDEX_EXPRESSION },
-    { Nonterminal::STRUCT_EXPRESSION }, 
-    { Nonterminal::CALL_EXPRESSION },
-    { Nonterminal::METHOD_CALL_EXPRESSION },
-    { Nonterminal::FIELD_EXPRESSION },
-    { Nonterminal::CONTINUE_EXPRESSION },
-    { Nonterminal::BREAK_EXPRESSION },
-    { Nonterminal::RETURN_EXPRESSION },
-    { Nonterminal::UNDERSCORE_EXPRESSION }
-  },
-  
 };
