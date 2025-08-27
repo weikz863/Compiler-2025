@@ -100,10 +100,56 @@ const std::array<std::vector<std::vector<std::variant<Token, Nonterminal>>>, 1> 
     { Nonterminal::BLOCK_EXPRESSION },
     { Token(Token::Type::Punctuation, ";") }
   },
-
-
-
-
+  // 15. STRUCT -> "struct" Identifier ("{" OPTIONAL_STRUCT_FIELDS "}" | ";")
+  {
+    { Token(Token::Type::Keyword, "struct"), Token(Token::Type::Identifier), 
+      Token(Token::Type::Punctuation, "{"), Nonterminal::STRUCT_FIELDS, 
+      Token(Token::Type::Punctuation, "}") },
+    { Token(Token::Type::Keyword, "struct"), Token(Token::Type::Identifier), 
+      Token(Token::Type::Punctuation, ";") }
+  },
+  // 16. STRUCT_FIELDS -> STRUCT_FIELD COMMA_STRUCT_FIELDS OPTIONAL_COMMA
+  {
+    { Nonterminal::STRUCT_FIELD, Nonterminal::COMMA_STRUCT_FIELDS, Nonterminal::OPTIONAL_COMMA },
+  },
+  // 17. STRUCT_FIELD -> Identifier ":" TYPE
+  {
+    { Token(Token::Type::Identifier), Token(Token::Type::Punctuation, ":"), Nonterminal::TYPE }
+  },
+  // 18. OPTIONAL_STRUCT_FIELDS -> STRUCT_FIELDS | epsilon
+  {
+    { Nonterminal::STRUCT_FIELDS },
+    { }
+  },
+  // 19. COMMA_STRUCT_FIELDS -> COMMA_STRUCT_FIELDS "," STRUCT_FIELD | epsilon
+  {
+    { Nonterminal::COMMA_STRUCT_FIELDS, Token(Token::Type::Punctuation, ","), Nonterminal::STRUCT_FIELD },
+    { }
+  },
+  // 20. ENUMERATION -> "enum" Identifier "{" OPTIONAL_ENUM_VARIANTS "}" 
+  {
+    { Token(Token::Type::Keyword, "enum"), Token(Token::Type::Identifier), 
+      Token(Token::Type::Punctuation, "{"), Nonterminal::OPTIONAL_ENUM_VARIANTS, 
+      Token(Token::Type::Punctuation, "}") }
+  },
+  // 21. ENUM_VARIANTS -> ENUM_VARIANT COMMA_ENUM_VARIANTS OPTIONAL_COMMA
+  {
+    { Nonterminal::ENUM_VARIANT, Nonterminal::COMMA_ENUM_VARIANTS, Nonterminal::OPTIONAL_COMMA }
+  },
+  // 22. ENUM_VARIANT -> Identifier
+  {
+    { Token(Token::Type::Identifier) }
+  },
+  // 23. OPTIONAL_ENUM_VARIANTS -> ENUM_VARIANTS | epsilon
+  {
+    { Nonterminal::ENUM_VARIANTS },
+    { }
+  },
+  // 24. COMMA_ENUM_VARIANTS -> COMMA_ENUM_VARIANTS "," ENUM_VARIANT | epsilon
+  {
+    { Nonterminal::COMMA_ENUM_VARIANTS, Token(Token::Type::Punctuation, ","), Nonterminal::ENUM_VARIANT },
+    { }
+  },
 
 
 
