@@ -29,6 +29,11 @@ enum class Nonterminal {
     ENUM_VARIANT,
       OPTIONAL_ENUM_VARIANTS,
       COMMA_ENUM_VARIANTS,
+  CONSTANT_ITEM,
+  TRAIT,
+  IMPLEMENTATION,
+    INHERENT_IMPL,
+    TRAIT_IMPL,
 };
 
 #endif
