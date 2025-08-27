@@ -10,12 +10,12 @@
 // the first rule is the start symbol
 // rules are tried in order, the first matching rule is used
 const std::array<std::vector<std::vector<std::variant<Token, Nonterminal>>>, 1> parse_rules = {
-  // ITEMS -> ITEMS ITEM | epsilon
+  // 0. ITEMS -> ITEMS ITEM | epsilon
   {
     { Nonterminal::ITEMS, Nonterminal::ITEM },
     { }
   },
-  // ITEM -> FUNCTION | STRUCT | ENUMERATION | CONSTANT_ITEM | TRAIT | IMPLEMENTATION
+  // 1. ITEM -> FUNCTION | STRUCT | ENUMERATION | CONSTANT_ITEM | TRAIT | IMPLEMENTATION
   {
     { Nonterminal::FUNCTION },
     { Nonterminal::STRUCT },
@@ -24,8 +24,144 @@ const std::array<std::vector<std::vector<std::variant<Token, Nonterminal>>>, 1> 
     { Nonterminal::TRAIT },
     { Nonterminal::IMPLEMENTATION },
   },
-  // FUNCTION -> OPTIONAL_CONST "fn" Identifier "(" ")" "{" ITEMS "}"
+  // 2. FUNCTION -> OPTIONAL_CONST "fn" Identifier "(" OPTIONAL_FUNCTION_PARAMETERS ")"
+  //             OPTIONAL_FUNCTION_RETURN_TYPE "(" BLOCK_EXPRESSION_OR_COLON ")"
   {
-    { Nonterminal::OPTIONAL_CONST, Token(Token::Type::Keyword, "fn"), Token(Token::Type::Identifier), Token(Token::Type::Punctuation), Token(Token::Type::Punctuation), Token(Token::Type::Punctuation), Nonterminal::ITEMS, Token(Token::Type::Punctuation) }
+    { Nonterminal::OPTIONAL_CONST, Token(Token::Type::Keyword, "fn"), Token(Token::Type::Identifier),
+      Token(Token::Type::Punctuation, "("), Nonterminal::OPTIONAL_FUNCTION_PARAMETERS, 
+      Token(Token::Type::Punctuation, ")"), Nonterminal::OPTIONAL_FUNCTION_RETURN_TYPE, 
+      Token(Token::Type::Punctuation, "("), Nonterminal::BLOCK_EXPRESSION_OR_COLON, 
+      Token(Token::Type::Punctuation, ")") }
   },
+  // 3. OPTIONAL_CONST -> "const" | epsilon
+  {
+    { Token(Token::Type::Keyword, "const") },
+    { }
+  },
+  // 4. FUNCTION_PARAMETERS -> SELF_PARAM OPTIONAL_COMMA | 
+  //                        FUNCTION_PARAM COMMA_FUNCTION_PARAMS OPTIONAL_COMMA |
+  //                        SELF_PARAM "," FUNCTION_PARAM COMMA_FUNCTION_PARAMETERS OPTIONAL_COMMA
+  {
+    { Nonterminal::SELF_PARAM, Nonterminal::OPTIONAL_COMMA },
+    { Nonterminal::FUNCTION_PARAM, Nonterminal::COMMA_FUNCTION_PARAMETERS, Nonterminal::OPTIONAL_COMMA },
+    { Nonterminal::SELF_PARAM, Token(Token::Type::Punctuation, ","), Nonterminal::FUNCTION_PARAM,
+      Nonterminal::COMMA_FUNCTION_PARAMETERS, Nonterminal::OPTIONAL_COMMA }
+  },
+  // 5. SELF_PARAM -> SHORTHAND_SELF | TYPED_SELF
+  {
+    { Nonterminal::SHORTHAND_SELF },
+    { Nonterminal::TYPED_SELF }
+  },
+  // 6. SHORTHAND_SELF -> "&"? "mut"? "self"
+  {
+    { Token(Token::Type::Punctuation, "&"), Token(Token::Type::Keyword, "mut"), 
+      Token(Token::Type::Keyword, "self") },
+    { Token(Token::Type::Punctuation, "&"), Token(Token::Type::Keyword, "self") },
+    { Token(Token::Type::Keyword, "mut"), Token(Token::Type::Keyword, "self") },
+    { Token(Token::Type::Keyword, "self") }
+  },
+  // 7. TYPED_SELF -> "mut"?" "self" ":" TYPE
+  {
+    { Token(Token::Type::Keyword, "mut"), Token(Token::Type::Keyword, "self"), 
+      Token(Token::Type::Punctuation, ":"), Nonterminal::TYPE },
+    { Token(Token::Type::Keyword, "self"), 
+      Token(Token::Type::Punctuation, ":"), Nonterminal::TYPE }
+  },
+  // 8. FUNCTION_PARAM -> PATTERN ":" TYPE
+  {
+    { Nonterminal::PATTERN, Token(Token::Type::Punctuation, ":"), Nonterminal::TYPE }
+  },
+  // 9. FUNCTION_RETURN_TYPE -> "->" TYPE
+  {
+    { Token(Token::Type::Punctuation, "->"), Nonterminal::TYPE },
+  },
+  // 10. OPTIONAL_FUNCTION_PARAMETERS -> FUNCTION_PARAMETERS | epsilon
+  {
+    { Nonterminal::FUNCTION_PARAMETERS },
+    { }
+  },
+  // 11. OPTIONAL_COMMA -> "," | epsilon
+  {
+    { Token(Token::Type::Punctuation, ",") },
+    { }
+  },
+  // 12. COMMA_FUNCTION_PARAMS -> COMMA_FUNCTION_PARAMS "," FUNCTION_PARAM | epsilon
+  {
+    { Nonterminal::COMMA_FUNCTION_PARAMS, Token(Token::Type::Punctuation, ","), Nonterminal::FUNCTION_PARAM },
+    { }
+  },
+  // 13. OPTIONAL_FUNCTION_RETURN_TYPE -> FUNCTION_RETURN_TYPE | epsilon
+  {
+    { Nonterminal::FUNCTION_RETURN_TYPE },
+    { }
+  },
+  // 14. BLOCK_EXPRESSION_OR_SEMICOLON -> BLOCK_EXPRESSION | ";"
+  {
+    { Nonterminal::BLOCK_EXPRESSION },
+    { Token(Token::Type::Punctuation, ";") }
+  },
+
+
+
+
+
+
+
+
+  // TYPE -> TYPE_PATH | REFERENCE_TYPE | ARRAY_TYPE | UNIT_TYPE
+  {
+    { Nonterminal::TYPE_PATH },
+    { Nonterminal::REFERENCE_TYPE },
+    { Nonterminal::ARRAY_TYPE },
+    { Nonterminal::UNIT_TYPE }
+  },
+  // TYPE_PATH -> Identifier | "Self" | "self"
+  {
+    { Token(Token::Type::Identifier) },
+    { Token(Token::Type::Keyword, "Self") },
+    { Token(Token::Type::Keyword, "self") }
+  },
+  // REFERENCE_TYPE -> "&" OPTIONAL_MUT TYPE
+  {
+    { Token(Token::Type::Punctuation, "&"), Nonterminal::OPTIONAL_MUT, Nonterminal::TYPE }
+  },
+  // ARRAY_TYPE -> "[" TYPE ";" EXPRESSION "]"
+  {
+    { Token(Token::Type::Punctuation, "["), Nonterminal::TYPE, 
+      Token(Token::Type::Punctuation, ";"), Nonterminal::EXPRESSION, 
+      Token(Token::Type::Punctuation, "]") }
+  },
+  // EXPRESSION -> EXPRESSION_WITH_BLOCK | EXPRESSION_WITHOUT_BLOCK
+  {
+    { Nonterminal::EXPRESSION_WITH_BLOCK },
+    { Nonterminal::EXPRESSION_WITHOUT_BLOCK }
+  },
+  // EXPRESSION_WITHOUT_BLOCK -> LITERAL_EXPRESSION | PATH_EXPRESSION | OPERATOR_EXPRESSION |
+  //                            GROUPED_EXPRESSION | ARRAY_EXPRESSION | INDEX_EXPRESSION |
+  //                            STRUCT_EXPRESSION | CALL_EXPRESSION | METHOD_CALL_EXPRESSION |
+  //                            FIELD_EXPRESSION | CONTINUE_EXPRESSION | BREAK_EXPRESSION |
+  //                            RETURN_EXPRESSION | UNDERSCORE_EXPRESSION
+  {
+    { Nonterminal::LITERAL_EXPRESSION },
+    { Nonterminal::PATH_EXPRESSION },
+    { Nonterminal::OPERATOR_EXPRESSION },
+    { Nonterminal::GROUPED_EXPRESSION },
+    { Nonterminal::ARRAY_EXPRESSION },
+    { Nonterminal::INDEX_EXPRESSION },
+    { Nonterminal::STRUCT_EXPRESSION }, 
+    { Nonterminal::CALL_EXPRESSION },
+    { Nonterminal::METHOD_CALL_EXPRESSION },
+    { Nonterminal::FIELD_EXPRESSION },
+    { Nonterminal::CONTINUE_EXPRESSION },
+    { Nonterminal::BREAK_EXPRESSION },
+    { Nonterminal::RETURN_EXPRESSION },
+    { Nonterminal::UNDERSCORE_EXPRESSION }
+  },
+
+  // OPTIONAL_COMMA -> "," | epsilon
+  {
+    { Token(Token::Type::Punctuation, ",") },
+    { }
+  },
+  
 };
