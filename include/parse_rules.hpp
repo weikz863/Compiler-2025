@@ -1,0 +1,12 @@
+#pragma once
+
+#ifndef _PARSE_RULES_HPP_
+#define _PARSE_RULES_HPP_
+
+enum class Nonterminal {
+  ITEMS, ITEM, FUNCTION, 
+  OPTIONAL_CONST, 
+  STRUCT, ENUMERATION, CONSTANT_ITEM, TRAIT, IMPLEMENTATION,
+};
+
+#endif
