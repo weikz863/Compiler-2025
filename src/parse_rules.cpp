@@ -361,4 +361,107 @@ const std::array<std::vector<std::vector<std::variant<Token, Nonterminal>>>, 1> 
     { Token(Token::Type::Punctuation, "!"), Nonterminal::UNARY_OPERATOR_EXPRESSION },
     { Token(Token::Type::Punctuation, "-"), Nonterminal::UNARY_OPERATOR_EXPRESSION }
   },
+  // 61. TYPE_CAST_EXPRESSION -> UNARY_OPERATOR_EXPRESSION | TYPE_CAST_EXPRESSION "as" TYPE_NO_BOUNDS
+  {
+    { Nonterminal::UNARY_OPERATOR_EXPRESSION },
+    { Nonterminal::TYPE_CAST_EXPRESSION, Token(Token::Type::Keyword, "as"), Nonterminal::TYPE_NO_BOUNDS }
+  },
+  // 62. MULTIPLICATIVE_OPERATOR_EXPRESSION -> TYPE_CAST_EXPRESSION | MULTIPLICATIVE_EXPRESSION ("*" | "/" | "%") TYPE_CAST_EXPRESSION
+  {
+    { Nonterminal::TYPE_CAST_EXPRESSION },
+    { Nonterminal::MULTIPLICATIVE_EXPRESSION, Token(Token::Type::Punctuation, "*"), Nonterminal::TYPE_CAST_EXPRESSION },
+    { Nonterminal::MULTIPLICATIVE_EXPRESSION, Token(Token::Type::Punctuation, "/"), Nonterminal::TYPE_CAST_EXPRESSION },
+    { Nonterminal::MULTIPLICATIVE_EXPRESSION, Token(Token::Type::Punctuation, "%"), Nonterminal::TYPE_CAST_EXPRESSION }
+  },
+  // 63. ADDITIVE_OPERATOR_EXPRESSION -> MULTIPLICATIVE_OPERATOR_EXPRESSION | ADDITIVE_OPERATOR_EXPRESSION ("+" | "-") MULTIPLICATIVE_OPERATOR_EXPRESSION
+  {
+    { Nonterminal::MULTIPLICATIVE_OPERATOR_EXPRESSION },
+    { Nonterminal::ADDITIVE_OPERATOR_EXPRESSION, Token(Token::Type::Punctuation, "+"), Nonterminal::MULTIPLICATIVE_OPERATOR_EXPRESSION },
+    { Nonterminal::ADDITIVE_OPERATOR_EXPRESSION, Token(Token::Type::Punctuation, "-"), Nonterminal::MULTIPLICATIVE_OPERATOR_EXPRESSION }
+  },
+  // 64. SHIFT_OPERATOR_EXPRESSION -> ADDITIVE_OPERATOR_EXPRESSION | SHIFT_OPERATOR_EXPRESSION ("<<" | ">>") ADDITIVE_OPERATOR_EXPRESSION
+  {
+    { Nonterminal::ADDITIVE_OPERATOR_EXPRESSION },
+    { Nonterminal::SHIFT_OPERATOR_EXPRESSION, Token(Token::Type::Punctuation, "<<"), Nonterminal::ADDITIVE_OPERATOR_EXPRESSION },
+    { Nonterminal::SHIFT_OPERATOR_EXPRESSION, Token(Token::Type::Punctuation, ">>"), Nonterminal::ADDITIVE_OPERATOR_EXPRESSION }
+  },
+  // 65. AND_EXPRESSION -> SHIFT_OPERATOR_EXPRESSION | AND_EXPRESSION "&" SHIFT_OPERATOR_EXPRESSION
+  {
+    { Nonterminal::SHIFT_OPERATOR_EXPRESSION },
+    { Nonterminal::AND_EXPRESSION, Token(Token::Type::Punctuation, "&"), Nonterminal::SHIFT_OPERATOR_EXPRESSION }
+  },
+  // 66. XOR_EXPRESSION -> AND_EXPRESSION | XOR_EXPRESSION "^" AND_EXPRESSION
+  {
+    { Nonterminal::AND_EXPRESSION },
+    { Nonterminal::XOR_EXPRESSION, Token(Token::Type::Punctuation, "^"), Nonterminal::AND_EXPRESSION }
+  },
+  // 67. OR_EXPRESSION -> XOR_EXPRESSION | OR_EXPRESSION "|" XOR_EXPRESSION
+  {
+    { Nonterminal::XOR_EXPRESSION },
+    { Nonterminal::OR_EXPRESSION, Token(Token::Type::Punctuation, "|"), Nonterminal::XOR_EXPRESSION }
+  },
+  // 68. COMPARISON_OPERATOR_EXPRESSION -> OR_EXPRESSION | OR_EXPRESSION ("==" | "!=" | "<" | "<=" | ">" | ">=") OR_EXPRESSION
+  {
+    { Nonterminal::OR_EXPRESSION },
+    { Nonterminal::OR_EXPRESSION, Token(Token::Type::Punctuation, "=="), Nonterminal::OR_EXPRESSION },
+    { Nonterminal::OR_EXPRESSION, Token(Token::Type::Punctuation, "!="), Nonterminal::OR_EXPRESSION },
+    { Nonterminal::OR_EXPRESSION, Token(Token::Type::Punctuation, "<"), Nonterminal::OR_EXPRESSION },
+    { Nonterminal::OR_EXPRESSION, Token(Token::Type::Punctuation, "<="), Nonterminal::OR_EXPRESSION },
+    { Nonterminal::OR_EXPRESSION, Token(Token::Type::Punctuation, ">"), Nonterminal::OR_EXPRESSION },
+    { Nonterminal::OR_EXPRESSION, Token(Token::Type::Punctuation, ">="), Nonterminal::OR_EXPRESSION }
+  },
+  // 69. LAZY_AND_EXPRESSION -> COMPARISON_OPERATOR_EXPRESSION | LAZY_AND_EXPRESSION "&&" COMPARISON_OPERATOR_EXPRESSION
+  {
+    { Nonterminal::COMPARISON_OPERATOR_EXPRESSION },
+    { Nonterminal::LAZY_AND_EXPRESSION, Token(Token::Type::Punctuation, "&&"), Nonterminal::COMPARISON_OPERATOR_EXPRESSION }
+  },
+  // 70. LAZY_OR_EXPRESSION -> LAZY_AND_EXPRESSION | LAZY_OR_EXPRESSION "||" LAZY_AND_EXPRESSION
+  {
+    { Nonterminal::LAZY_AND_EXPRESSION },
+    { Nonterminal::LAZY_OR_EXPRESSION, Token(Token::Type::Punctuation, "||"), Nonterminal::LAZY_AND_EXPRESSION }
+  },
+  // 71. ASSIGNMENT_EXPRESSION -> LAZY_OR_EXPRESSION | SIMPLE_ASSIGNMENT_EXPRESSION | COMPOUND_ASSIGNMENT_EXPRESSION
+  {
+    { Nonterminal::LAZY_OR_EXPRESSION },
+    { Nonterminal::SIMPLE_ASSIGNMENT_EXPRESSION },
+    { Nonterminal::COMPOUND_ASSIGNMENT_EXPRESSION }
+  },
+  // 72. SIMPLE_ASSIGNMENT_EXPRESSION -> LAZY_OR_EXPRESSION "=" ASSIGNMENT_EXPRESSION
+  {
+    { Nonterminal::LAZY_OR_EXPRESSION, Token(Token::Type::Punctuation, "="), Nonterminal::ASSIGNMENT_EXPRESSION }
+  },
+  // 73. COMPOUND_ASSIGNMENT_EXPRESSION -> LAZY_OR_EXPRESSION ("+=" | "-=" | "*=" | "/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>=") ASSIGNMENT_EXPRESSION
+  {
+    { Nonterminal::LAZY_OR_EXPRESSION, Token(Token::Type::Punctuation, "+="), Nonterminal::ASSIGNMENT_EXPRESSION },
+    { Nonterminal::LAZY_OR_EXPRESSION, Token(Token::Type::Punctuation, "-="), Nonterminal::ASSIGNMENT_EXPRESSION },
+    { Nonterminal::LAZY_OR_EXPRESSION, Token(Token::Type::Punctuation, "*="), Nonterminal::ASSIGNMENT_EXPRESSION },
+    { Nonterminal::LAZY_OR_EXPRESSION, Token(Token::Type::Punctuation, "/="), Nonterminal::ASSIGNMENT_EXPRESSION },
+    { Nonterminal::LAZY_OR_EXPRESSION, Token(Token::Type::Punctuation, "%="), Nonterminal::ASSIGNMENT_EXPRESSION },
+    { Nonterminal::LAZY_OR_EXPRESSION, Token(Token::Type::Punctuation, "&="), Nonterminal::ASSIGNMENT_EXPRESSION },
+    { Nonterminal::LAZY_OR_EXPRESSION, Token(Token::Type::Punctuation, "|="), Nonterminal::ASSIGNMENT_EXPRESSION },
+    { Nonterminal::LAZY_OR_EXPRESSION, Token(Token::Type::Punctuation, "^="), Nonterminal::ASSIGNMENT_EXPRESSION },
+    { Nonterminal::LAZY_OR_EXPRESSION, Token(Token::Type::Punctuation, "<<="), Nonterminal::ASSIGNMENT_EXPRESSION },
+    { Nonterminal::LAZY_OR_EXPRESSION, Token(Token::Type::Punctuation, ">>="), Nonterminal::ASSIGNMENT_EXPRESSION }
+  },
+  // 74. FLOW_CONTROL_EXPRESSION -> ASSIGNMENT_EXPRESSION | CONTINUE_EXPRESSION | BREAK_EXPRESSION | RETURN_EXPRESSION
+  {
+    { Nonterminal::ASSIGNMENT_EXPRESSION },
+    { Nonterminal::CONTINUE_EXPRESSION },
+    { Nonterminal::BREAK_EXPRESSION },
+    { Nonterminal::RETURN_EXPRESSION }
+  },
+  // 75. CONTINUE_EXPRESSION -> "continue"
+  {
+    { Token(Token::Type::Keyword, "continue") }
+  },
+  // 76. BREAK_EXPRESSION -> "break" FLOW_CONTROL_EXPRESSION?
+  {
+    { Token(Token::Type::Keyword, "break"), Nonterminal::FLOW_CONTROL_EXPRESSION },
+    { Token(Token::Type::Keyword, "break") }
+  },
+  // 77. RETURN_EXPRESSION -> "return" FLOW_CONTROL_EXPRESSION?
+  {
+    { Token(Token::Type::Keyword, "return"), Nonterminal::FLOW_CONTROL_EXPRESSION },
+    { Token(Token::Type::Keyword, "return") }
+  },
 };
