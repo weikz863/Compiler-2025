@@ -38,7 +38,7 @@ enum class Nonterminal {
     LET_STATEMENT,
     EXPRESSION_STATEMENT,
   EXPRESSION,
-    EXPRESSION_WITHOUT_BLOCK,
+    UNUSED1, // expression without block is removed; see comment in parse_rules.cpp
       BASIC_EXPRESSION,
         LITERAL_EXPRESSION,
         UNDERSCORE_EXPRESSION,
@@ -84,9 +84,12 @@ enum class Nonterminal {
         RETURN_EXPRESSION,
     EXPRESSION_WITH_BLOCK,
       BLOCK_EXPRESSION,
-      CONST_BLOCK_EXPRESSION,
+        STATEMENTS,
       LOOP_EXPRESSION,
+        INFINITE_LOOP_EXPRESSION,
+        PREDICATE_LOOP_EXPRESSION,
       IF_EXPRESSION,
+        CONDITIONS,
 };
 
 #endif
