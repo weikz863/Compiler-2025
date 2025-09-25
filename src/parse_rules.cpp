@@ -24,6 +24,10 @@
 // {{2} - 3} results in a parse error in standard Rust because the compiler expects {2} to be a statement
 // it seems that testcases like this are inexistent 
 
+// wildcard patterns and reference patterns are unused
+// anyway, in Rust &mut x means (&mut) x, &(mut x) has another meaning
+// this means &mut is preferred to & in reference patterns
+
 // ambiguous grammar 1: method call vs field access and call
 // parsed as method call per Rust grammar
 // implementation: method call has higher precedence than field access and call
@@ -533,5 +537,66 @@ const std::array<std::vector<std::vector<std::variant<Token, Nonterminal>>>, 1> 
   {
     { Token(Token::Type::Punctuation, "("), Nonterminal::EXPRESSION, 
       Token(Token::Type::Punctuation, ")") }
+  }
+  // 86. PATTERN -> IDENTIFIER_PATTERN | WILDCARD_PATTERN | REFERENCE_PATTERN
+  {
+    { Nonterminal::IDENTIFIER_PATTERN },
+    { Nonterminal::WILDCARD_PATTERN },
+    { Nonterminal::REFERENCE_PATTERN }
+  },
+  // 87. IDENTIFIER_PATTERN -> "ref"? "mut"? Identifier
+  {
+    { Token(Token::Type::Keyword, "ref"), Token(Token::Type::Keyword, "mut"), 
+      Token(Token::Type::Identifier) },
+    { Token(Token::Type::Keyword, "ref"), Token(Token::Type::Identifier) },
+    { Token(Token::Type::Keyword, "mut"), Token(Token::Type::Identifier) },
+    { Token(Token::Type::Identifier) }
+  },
+  // 88. WILDCARD_PATTERN -> "_"
+  {
+    { Token(Token::Type::Punctuation, "_") }
+  },
+  // 89. REFERENCE_PATTERN -> ("&" | "&&") "mut"? PATTERN
+  {
+    { Token(Token::Type::Punctuation, "&"), Token(Token::Type::Keyword, "mut"), Nonterminal::PATTERN },
+    { Token(Token::Type::Punctuation, "&"), Nonterminal::PATTERN },
+    { Token(Token::Type::Punctuation, "&&"), Token(Token::Type::Keyword, "mut"), Nonterminal::PATTERN },
+    { Token(Token::Type::Punctuation, "&&"), Nonterminal::PATTERN }
+  }
+  // 90. TYPE -> TYPE_PATH | REFERENCE_TYPE | ARRAY_TYPE | UNIT_TYPE
+  {
+    { Nonterminal::TYPE_PATH },
+    { Nonterminal::REFERENCE_TYPE },
+    { Nonterminal::ARRAY_TYPE },
+    { Nonterminal::UNIT_TYPE }
+  },
+  // 91. TYPE_PATH -> PATH_EXPR_SEGMENT
+  {
+    { Nonterminal::PATH_EXPR_SEGMENT }
+  },
+  // 92. REFERENCE_TYPE -> "&" "mut"? TYPE
+  {
+    { Token(Token::Type::Punctuation, "&"), Token(Token::Type::Keyword, "mut"), Nonterminal::TYPE },
+    { Token(Token::Type::Punctuation, "&"), Nonterminal::TYPE }
+  },
+  // 93. ARRAY_TYPE -> "[" TYPE ";" EXPRESSION "]"
+  {
+    { Token(Token::Type::Punctuation, "["), Nonterminal::TYPE, Token(Token::Type::Punctuation, ";"), 
+      Nonterminal::EXPRESSION, Token(Token::Type::Punctuation, "]") }
+  },
+  // 94. UNIT_TYPE -> "(" ")"
+  {
+    { Token(Token::Type::Punctuation, "("), Token(Token::Type::Punctuation, ")") }
+  }
+  // 95. PATH_IN_EXPRESSION -> PATH_EXPR_SEGMENT ("::" PATH_EXPR_SEGMENT)?
+  {
+    { Nonterminal::PATH_EXPR_SEGMENT },
+    { Nonterminal::PATH_EXPR_SEGMENT, Token(Token::Type::Punctuation, "::"), Nonterminal::PATH_EXPR_SEGMENT }
+  },
+  // 96. PATH_EXPR_SEGMENT -> Identifier | "Self" | "self"
+  {
+    { Token(Token::Type::Identifier) },
+    { Token(Token::Type::Keyword, "Self") },
+    { Token(Token::Type::Keyword, "self") }
   }
 };
