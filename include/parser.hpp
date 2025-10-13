@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <vector>
+#include <set>
 #include "lexer.hpp"
 #include "parse_rules.hpp"
 
