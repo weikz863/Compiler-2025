@@ -34,7 +34,6 @@ class EarleyParser {
   EarleyParser& operator=(EarleyParser &&) = delete;
   ~EarleyParser() = default;
   
-  void parse();
  private:
   const std::vector<Token> tokens;
   std::vector<std::set<ParsingState>> table;
