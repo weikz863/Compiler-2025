@@ -13,7 +13,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_library(my_library src/lexer.cpp)
+add_library(my_library src/lexer.cpp src/parse_rules.cpp src/parser.cpp)
+
+add_executable(
+  main
+  src/main.cpp
+)
 
 enable_testing()
 
