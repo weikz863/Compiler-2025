@@ -30,6 +30,8 @@ class Token {
   Token(Type t);
   Token(Type t, const std::string &v);
   void read_from(const std::string_view &);
+  bool match(const Token&) const;
+
   Type type;
   std::string value;
 };

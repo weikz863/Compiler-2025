@@ -3,6 +3,11 @@
 #ifndef _PARSE_RULES_HPP_
 #define _PARSE_RULES_HPP_
 
+#include <array>
+#include <vector>
+#include <variant>
+#include "lexer.hpp"
+
 enum class Nonterminal {
   ITEMS, 
   ITEM, 
@@ -102,5 +107,11 @@ enum class Nonterminal {
   PATH_IN_EXPRESSION,
     PATH_EXPR_SEGMENT,
 };
+
+typedef std::variant<Token, Nonterminal> Symbol;
+typedef std::vector<Symbol> Production;
+
+static_assert(static_cast<int>(Nonterminal::PATH_EXPR_SEGMENT) + 1 == 97, "Ensure sizes match");
+extern const std::array<std::vector<Production>, 97> parse_rules;
 
 #endif

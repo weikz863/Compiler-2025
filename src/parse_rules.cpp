@@ -49,7 +49,7 @@
 // epsilon production is allowed
 // the first rule is the start symbol
 // rules are tried in order, the first matching rule is used
-const std::array<std::vector<std::vector<std::variant<Token, Nonterminal>>>, 1> parse_rules = {
+const std::array<std::vector<std::vector<std::variant<Token, Nonterminal>>>, 97> parse_rules = {
   // 0. ITEMS -> ITEMS ITEM | epsilon
   {
     { Nonterminal::ITEMS, Nonterminal::ITEM },
