@@ -65,13 +65,11 @@ const std::array<std::vector<Production>, 97> parse_rules {
     Production{ Symbol{Nonterminal::IMPLEMENTATION} },
   },
   // 2. FUNCTION -> OPTIONAL_CONST "fn" Identifier "(" OPTIONAL_FUNCTION_PARAMETERS ")"
-  //             OPTIONAL_FUNCTION_RETURN_TYPE "(" BLOCK_EXPRESSION_OR_SEMICOLON ")"
+  //             OPTIONAL_FUNCTION_RETURN_TYPE BLOCK_EXPRESSION_OR_SEMICOLON
   {
     { Nonterminal::OPTIONAL_CONST, Token(Token::Type::Keyword, "fn"), Token(Token::Type::Identifier),
-      Token(Token::Type::Punctuation, "("), Nonterminal::OPTIONAL_FUNCTION_PARAMETERS, 
-      Token(Token::Type::Punctuation, ")"), Nonterminal::OPTIONAL_FUNCTION_RETURN_TYPE, 
-      Token(Token::Type::Punctuation, "("), Nonterminal::BLOCK_EXPRESSION_OR_SEMICOLON, 
-      Token(Token::Type::Punctuation, ")") }
+      Nonterminal::OPTIONAL_FUNCTION_PARAMETERS,  Nonterminal::OPTIONAL_FUNCTION_RETURN_TYPE,
+      Nonterminal::BLOCK_EXPRESSION_OR_SEMICOLON },
   },
   // 3. OPTIONAL_CONST -> "const" | epsilon
   {
