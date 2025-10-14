@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 #include <set>
+#include <optional>
 #include "lexer.hpp"
 #include "parse_rules.hpp"
 
@@ -33,10 +34,21 @@ class EarleyParser {
   EarleyParser& operator=(const EarleyParser &) = delete;
   EarleyParser& operator=(EarleyParser &&) = delete;
   ~EarleyParser() = default;
-  
+  bool accepts() const;
+
  private:
   const std::vector<Token> tokens;
-  std::vector<std::set<ParsingState>> table;
+  std::vector<std::vector<ParsingState>> table;
+
+  bool is_finished(const ParsingState& state) const;
+  bool is_empty_production(const ParsingState& state) const;
+  Symbol next_element(const ParsingState& state) const;
+  bool is_nonterminal(const Symbol& symbol) const;
+  bool is_terminal(const Symbol& symbol) const;
+  void add_to_set(ParsingState state, std::size_t chart_index);
+  void predictor(const ParsingState& state, std::size_t chart_index);
+  void scanner(const ParsingState& state, std::size_t chart_index);
+  void completer(const ParsingState& state, std::size_t chart_index);
 };
 
 #endif
