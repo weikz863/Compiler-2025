@@ -326,10 +326,9 @@ const std::array<std::vector<Production>, 97> parse_rules {
   {
     { Token(Token::Type::Identifier), Token(Token::Type::Punctuation, ":"), Nonterminal::EXPRESSION }
   },
-  // 49. METHOD_CALL_EXPRESSION -> BASIC_EXPRESSION | METHOD_CALL_EXPRESSION "." PATH_EXPR_SEGMENT "(" OPTIONAL_CALL_PARAMS ")"
+  // 49. METHOD_CALL_EXPRESSION -> POSTFIX_EXPRESSION "." PATH_EXPR_SEGMENT "(" OPTIONAL_CALL_PARAMS ")"
   {
-    { Nonterminal::BASIC_EXPRESSION },
-    { Nonterminal::METHOD_CALL_EXPRESSION, Token(Token::Type::Punctuation, "."), Nonterminal::PATH_EXPR_SEGMENT,
+    { Nonterminal::POSTFIX_EXPRESSION, Token(Token::Type::Punctuation, "."), Nonterminal::PATH_EXPR_SEGMENT,
       Token(Token::Type::Punctuation, "("), Nonterminal::OPTIONAL_CALL_PARAMS, Token(Token::Type::Punctuation, ")") }
   },
   // 50. OPTIONAL_CALL_PARAMS -> CALL_PARAMS | epsilon
@@ -346,30 +345,31 @@ const std::array<std::vector<Production>, 97> parse_rules {
     { Nonterminal::COMMA_CALL_PARAMS, Token(Token::Type::Punctuation, ","), Nonterminal::EXPRESSION },
     { }
   },
-  // 53. FIELD_EXPRESSION -> METHOD_CALL_EXPRESSION | FIELD_EXPRESSION "." Identifier
+  // 53. FIELD_EXPRESSION -> POSTFIX_EXPRESSION "." Identifier
   {
-    { Nonterminal::METHOD_CALL_EXPRESSION },
-    { Nonterminal::FIELD_EXPRESSION, Token(Token::Type::Punctuation, "."), Token(Token::Type::Identifier) }
+    { Nonterminal::POSTFIX_EXPRESSION, Token(Token::Type::Punctuation, "."), Token(Token::Type::Identifier) }
   },
-  // 54. PARANTHESIZED_EXPRESSION -> FIELD_EXPRESSION | CALL_EXPRESSION | INDEX_EXPRESSION
+  // 54. POSTFIX_EXPRESSION -> BASIC_EXPRESSION | METHOD_CALL_EXPRESSION | FIELD_EXPRESSION | CALL_EXPRESSION | INDEX_EXPRESSION
   {
+    { Nonterminal::BASIC_EXPRESSION },
+    { Nonterminal::METHOD_CALL_EXPRESSION },
     { Nonterminal::FIELD_EXPRESSION },
     { Nonterminal::CALL_EXPRESSION },
     { Nonterminal::INDEX_EXPRESSION }
   },
-  // 55. CALL_EXPRESSION -> PARANTHESIZED_EXPRESSION "(" OPTIONAL_CALL_PARAMS ")"
+  // 55. CALL_EXPRESSION -> POSTFIX_EXPRESSION "(" OPTIONAL_CALL_PARAMS ")"
   {
-    { Nonterminal::PARANTHESIZED_EXPRESSION, Token(Token::Type::Punctuation, "("), 
+    { Nonterminal::POSTFIX_EXPRESSION, Token(Token::Type::Punctuation, "("), 
       Nonterminal::OPTIONAL_CALL_PARAMS, Token(Token::Type::Punctuation, ")") }
   },
-  // 56. INDEX_EXPRESSION -> PARANTHESIZED_EXPRESSION "[" EXPRESSION "]"
+  // 56. INDEX_EXPRESSION -> POSTFIX_EXPRESSION "[" EXPRESSION "]"
   {
-    { Nonterminal::PARANTHESIZED_EXPRESSION, Token(Token::Type::Punctuation, "["), 
+    { Nonterminal::POSTFIX_EXPRESSION, Token(Token::Type::Punctuation, "["), 
       Nonterminal::EXPRESSION, Token(Token::Type::Punctuation, "]") }
   },
-  // 57. UNARY_OPERATOR_EXPRESSION -> PARANTHESIZED_EXPRESSION | BORROW_EXPRESSION | DEREFERENCE_EXPRESSION | NEGATION_EXPRESSION
+  // 57. UNARY_OPERATOR_EXPRESSION -> POSTFIX_EXPRESSION | BORROW_EXPRESSION | DEREFERENCE_EXPRESSION | NEGATION_EXPRESSION
   {
-    { Nonterminal::PARANTHESIZED_EXPRESSION },
+    { Nonterminal::POSTFIX_EXPRESSION },
     { Nonterminal::BORROW_EXPRESSION },
     { Nonterminal::DEREFERENCE_EXPRESSION },
     { Nonterminal::NEGATION_EXPRESSION }
