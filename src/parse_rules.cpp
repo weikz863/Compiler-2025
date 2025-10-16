@@ -30,7 +30,8 @@
 
 // ambiguous grammar 1: method call vs field access and call
 // parsed as method call per Rust grammar
-// implementation: method call has higher precedence than field access and call
+// implementation: method call has same precedence than field access and call, but preferred
+// this has been changed, precedence of them must be the same due to lexicographical structure
 
 // ambiguous grammar 2: {{2} - 3}
 // parsed as block expression containing a block expression-statement and a unary operator expression per Rust grammar
@@ -326,36 +327,36 @@ const std::array<std::vector<Production>, 97> parse_rules {
   {
     { Token(Token::Type::Identifier), Token(Token::Type::Punctuation, ":"), Nonterminal::EXPRESSION }
   },
-  // 49. METHOD_CALL_EXPRESSION -> POSTFIX_EXPRESSION "." PATH_EXPR_SEGMENT "(" OPTIONAL_CALL_PARAMS ")"
-  {
-    { Nonterminal::POSTFIX_EXPRESSION, Token(Token::Type::Punctuation, "."), Nonterminal::PATH_EXPR_SEGMENT,
-      Token(Token::Type::Punctuation, "("), Nonterminal::OPTIONAL_CALL_PARAMS, Token(Token::Type::Punctuation, ")") }
-  },
-  // 50. OPTIONAL_CALL_PARAMS -> CALL_PARAMS | epsilon
-  {
-    { Nonterminal::CALL_PARAMS },
-    { }
-  },
-  // 51. CALL_PARAMS -> EXPRESSION COMMA_CALL_PARAMS OPTIONAL_COMMA
-  {
-    { Nonterminal::EXPRESSION, Nonterminal::COMMA_CALL_PARAMS, Nonterminal::OPTIONAL_COMMA }
-  },
-  // 52. COMMA_CALL_PARAMS -> COMMA_CALL_PARAMS "," EXPRESSION | epsilon
-  {
-    { Nonterminal::COMMA_CALL_PARAMS, Token(Token::Type::Punctuation, ","), Nonterminal::EXPRESSION },
-    { }
-  },
-  // 53. FIELD_EXPRESSION -> POSTFIX_EXPRESSION "." Identifier
-  {
-    { Nonterminal::POSTFIX_EXPRESSION, Token(Token::Type::Punctuation, "."), Token(Token::Type::Identifier) }
-  },
-  // 54. POSTFIX_EXPRESSION -> BASIC_EXPRESSION | METHOD_CALL_EXPRESSION | FIELD_EXPRESSION | CALL_EXPRESSION | INDEX_EXPRESSION
+  // 49. POSTFIX_EXPRESSION -> BASIC_EXPRESSION | METHOD_CALL_EXPRESSION | FIELD_EXPRESSION | CALL_EXPRESSION | INDEX_EXPRESSION
   {
     { Nonterminal::BASIC_EXPRESSION },
     { Nonterminal::METHOD_CALL_EXPRESSION },
     { Nonterminal::FIELD_EXPRESSION },
     { Nonterminal::CALL_EXPRESSION },
     { Nonterminal::INDEX_EXPRESSION }
+  },
+  // 50. METHOD_CALL_EXPRESSION -> POSTFIX_EXPRESSION "." PATH_EXPR_SEGMENT "(" OPTIONAL_CALL_PARAMS ")"
+  {
+    { Nonterminal::POSTFIX_EXPRESSION, Token(Token::Type::Punctuation, "."), Nonterminal::PATH_EXPR_SEGMENT,
+      Token(Token::Type::Punctuation, "("), Nonterminal::OPTIONAL_CALL_PARAMS, Token(Token::Type::Punctuation, ")") }
+  },
+  // 51. OPTIONAL_CALL_PARAMS -> CALL_PARAMS | epsilon
+  {
+    { Nonterminal::CALL_PARAMS },
+    { }
+  },
+  // 52. CALL_PARAMS -> EXPRESSION COMMA_CALL_PARAMS OPTIONAL_COMMA
+  {
+    { Nonterminal::EXPRESSION, Nonterminal::COMMA_CALL_PARAMS, Nonterminal::OPTIONAL_COMMA }
+  },
+  // 53. COMMA_CALL_PARAMS -> COMMA_CALL_PARAMS "," EXPRESSION | epsilon
+  {
+    { Nonterminal::COMMA_CALL_PARAMS, Token(Token::Type::Punctuation, ","), Nonterminal::EXPRESSION },
+    { }
+  },
+  // 54. FIELD_EXPRESSION -> POSTFIX_EXPRESSION "." Identifier
+  {
+    { Nonterminal::POSTFIX_EXPRESSION, Token(Token::Type::Punctuation, "."), Token(Token::Type::Identifier) }
   },
   // 55. CALL_EXPRESSION -> POSTFIX_EXPRESSION "(" OPTIONAL_CALL_PARAMS ")"
   {
