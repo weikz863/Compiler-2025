@@ -184,7 +184,7 @@ EarleyParser::EarleyParser(std::vector<Token>&& input) : tokens{input}, table{to
       if (is_finished(state)) {
         std::cerr << "DEBUG: State is finished, calling completer" << std::endl;
         completer(state, k);
-      } else {
+      } else if (k < tokens.size()) {
         auto next = next_element(state);
         if (is_nonterminal(next)) {
           std::cerr << "DEBUG: Next element is nonterminal, calling predictor" << std::endl;
