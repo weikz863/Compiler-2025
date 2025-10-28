@@ -207,7 +207,7 @@ bool EarleyParser::accepts() const {
   for (const auto& state : final_chart) {
     // Look for a state that represents a completed ITEMS production
     if (state.nonterminal_type == static_cast<int>(Nonterminal::ITEMS) &&
-        state.start_token_index == 0 &&
+        state.start_token_index == 0 && state.production_index == 0 &&
         is_finished(state)) {
       return true;
     }
