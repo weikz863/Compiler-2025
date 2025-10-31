@@ -214,3 +214,19 @@ bool EarleyParser::accepts() const {
   }
   return false;
 }
+
+// pseudocode that ensures a rightmost derivation and correct rule precedence
+// adapted from *A Second Course in Formal Languanges and Automata Theory*
+// PARSE(A -> β•, i, j) 
+// /* Finds a rightmost derivation of w[i+1 .. j] starting with production A -> β• */
+//     If β = X1 X2 ... Xm, set k := m and l := j
+//     Repeat until k = 0:
+//         If Xk is terminal:
+//             set k := k - 1 and l := l - 1
+//         Else Xk is nonterminal
+//             for each production Xk -> γ•, tried in order:
+//                 find maximum possible r such that Xk -> γ• in [r, l]
+//                   and A -> X1 X2 ... Xk-1 • Xk ... Xm in [i, r] if exists
+//                 if found, break
+//             Call PARSE(Xk -> γ•, r, l)
+//         Set k := k - 1 and l := r 
