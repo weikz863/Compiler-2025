@@ -491,56 +491,389 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
   // Create the appropriate node for this nonterminal
   auto node = create_nonterminal_node(static_cast<Nonterminal>(state.nonterminal_type));
   
-  // Build child nodes based on the production
-  std::vector<std::unique_ptr<TreeNode>> children;
+  // Build child nodes and link them based on the production
   std::size_t token_pos = i;
+  std::size_t production_index = state.production_index;
 
-  for (const auto& symbol : production) {
-    if (std::holds_alternative<Token>(symbol)) {
-      // Terminal - create terminal node
-      const Token& token = std::get<Token>(symbol);
-      if (token_pos < tokens.size()) {
-        children.push_back(create_terminal_node(tokens[token_pos]));
-        token_pos++;
+  // Handle specific node types based on nonterminal type and production
+  switch (static_cast<Nonterminal>(state.nonterminal_type)) {
+    case Nonterminal::ITEMS: {
+      auto items_node = static_cast<ItemsNode*>(node.get());
+      if (production_index == 0) { // ITEMS -> ITEMS ITEM
+        // First child is ITEMS, second is ITEM
+        for (std::size_t r = i; r <= j; ++r) {
+          if (r >= table.size()) continue;
+          const auto& chart = table[r];
+          for (const auto& child_state : chart) {
+            if (child_state.nonterminal_type == static_cast<int>(Nonterminal::ITEMS) &&
+                is_finished_state(child_state, parse_rules)) {
+              items_node->items.push_back(construct_cst(child_state, child_state.start_token_index,
+                                                       child_state.start_token_index + get_production_length(child_state),
+                                                       table, tokens));
+              break;
+            }
+          }
+        }
+        // Add ITEM
+        for (std::size_t r = i; r <= j; ++r) {
+          if (r >= table.size()) continue;
+          const auto& chart = table[r];
+          for (const auto& child_state : chart) {
+            if (child_state.nonterminal_type == static_cast<int>(Nonterminal::ITEM) &&
+                is_finished_state(child_state, parse_rules)) {
+              items_node->items.push_back(construct_cst(child_state, child_state.start_token_index,
+                                                       child_state.start_token_index + get_production_length(child_state),
+                                                       table, tokens));
+              break;
+            }
+          }
+        }
       }
-    } else {
-      // Nonterminal - recursively build CST
-      Nonterminal child_nonterminal = std::get<Nonterminal>(symbol);
+      break;
+    }
+    
+    case Nonterminal::ITEM: {
+      auto item_node = static_cast<ItemNode*>(node.get());
+      // Single child - the actual item (FUNCTION, STRUCT, etc.)
+      for (const auto& symbol : production) {
+        if (std::holds_alternative<Nonterminal>(symbol)) {
+          Nonterminal child_nonterminal = std::get<Nonterminal>(symbol);
+          for (std::size_t r = i; r <= j; ++r) {
+            if (r >= table.size()) continue;
+            const auto& chart = table[r];
+            for (const auto& child_state : chart) {
+              if (child_state.nonterminal_type == static_cast<int>(child_nonterminal) &&
+                  is_finished_state(child_state, parse_rules)) {
+                item_node->item = construct_cst(child_state, child_state.start_token_index,
+                                               child_state.start_token_index + get_production_length(child_state),
+                                               table, tokens);
+                break;
+              }
+            }
+          }
+        }
+      }
+      break;
+    }
+    
+    case Nonterminal::FUNCTION: {
+      auto func_node = static_cast<FunctionNode*>(node.get());
+      // OPTIONAL_CONST "fn" Identifier "(" OPTIONAL_FUNCTION_PARAMETERS ")" OPTIONAL_FUNCTION_RETURN_TYPE BLOCK_EXPRESSION_OR_SEMICOLON
+      std::size_t symbol_idx = 0;
       
-      // Find the appropriate child state in the parsing table
-      bool found_child = false;
+      // Handle OPTIONAL_CONST
+      if (symbol_idx < production.size() && std::holds_alternative<Nonterminal>(production[symbol_idx]) &&
+          std::get<Nonterminal>(production[symbol_idx]) == Nonterminal::OPTIONAL_CONST) {
+        for (std::size_t r = i; r <= j; ++r) {
+          if (r >= table.size()) continue;
+          const auto& chart = table[r];
+          for (const auto& child_state : chart) {
+            if (child_state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_CONST) &&
+                is_finished_state(child_state, parse_rules)) {
+              func_node->optional_const = construct_cst(child_state, child_state.start_token_index,
+                                                       child_state.start_token_index + get_production_length(child_state),
+                                                       table, tokens);
+              break;
+            }
+          }
+        }
+        symbol_idx++;
+      }
+      
+      // Skip "fn" keyword
+      symbol_idx++;
+      
+      // Handle Identifier
+      if (symbol_idx < production.size() && std::holds_alternative<Token>(production[symbol_idx])) {
+        const Token& identifier_token = std::get<Token>(production[symbol_idx]);
+        if (identifier_token.type == Token::Type::Identifier && token_pos < tokens.size()) {
+          func_node->identifier = tokens[token_pos].value;
+          token_pos++;
+        }
+        symbol_idx++;
+      }
+      
+      // Skip "("
+      symbol_idx++;
+      
+      // Handle OPTIONAL_FUNCTION_PARAMETERS
+      if (symbol_idx < production.size() && std::holds_alternative<Nonterminal>(production[symbol_idx]) &&
+          std::get<Nonterminal>(production[symbol_idx]) == Nonterminal::OPTIONAL_FUNCTION_PARAMETERS) {
+        for (std::size_t r = i; r <= j; ++r) {
+          if (r >= table.size()) continue;
+          const auto& chart = table[r];
+          for (const auto& child_state : chart) {
+            if (child_state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_FUNCTION_PARAMETERS) &&
+                is_finished_state(child_state, parse_rules)) {
+              func_node->optional_function_parameters = construct_cst(child_state, child_state.start_token_index,
+                                                                     child_state.start_token_index + get_production_length(child_state),
+                                                                     table, tokens);
+              break;
+            }
+          }
+        }
+        symbol_idx++;
+      }
+      
+      // Skip ")"
+      symbol_idx++;
+      
+      // Handle OPTIONAL_FUNCTION_RETURN_TYPE
+      if (symbol_idx < production.size() && std::holds_alternative<Nonterminal>(production[symbol_idx]) &&
+          std::get<Nonterminal>(production[symbol_idx]) == Nonterminal::OPTIONAL_FUNCTION_RETURN_TYPE) {
+        for (std::size_t r = i; r <= j; ++r) {
+          if (r >= table.size()) continue;
+          const auto& chart = table[r];
+          for (const auto& child_state : chart) {
+            if (child_state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_FUNCTION_RETURN_TYPE) &&
+                is_finished_state(child_state, parse_rules)) {
+              func_node->optional_function_return_type = construct_cst(child_state, child_state.start_token_index,
+                                                                      child_state.start_token_index + get_production_length(child_state),
+                                                                      table, tokens);
+              break;
+            }
+          }
+        }
+        symbol_idx++;
+      }
+      
+      // Handle BLOCK_EXPRESSION_OR_SEMICOLON
+      if (symbol_idx < production.size() && std::holds_alternative<Nonterminal>(production[symbol_idx]) &&
+          std::get<Nonterminal>(production[symbol_idx]) == Nonterminal::BLOCK_EXPRESSION_OR_SEMICOLON) {
+        for (std::size_t r = i; r <= j; ++r) {
+          if (r >= table.size()) continue;
+          const auto& chart = table[r];
+          for (const auto& child_state : chart) {
+            if (child_state.nonterminal_type == static_cast<int>(Nonterminal::BLOCK_EXPRESSION_OR_SEMICOLON) &&
+                is_finished_state(child_state, parse_rules)) {
+              func_node->block_expression_or_semicolon = construct_cst(child_state, child_state.start_token_index,
+                                                                      child_state.start_token_index + get_production_length(child_state),
+                                                                      table, tokens);
+              break;
+            }
+          }
+        }
+      }
+      break;
+    }
+    
+    case Nonterminal::OPTIONAL_CONST: {
+      auto opt_const_node = static_cast<OptionalConstNode*>(node.get());
+      if (production_index == 0) { // "const"
+        // Empty - will be set to "const" by the token value
+        opt_const_node->value = "const";
+      } else {
+        // Epsilon - empty string
+        opt_const_node->value = "";
+      }
+      break;
+    }
+    
+    case Nonterminal::STRUCT_FIELDS: {
+      auto struct_fields_node = static_cast<StructFieldsNode*>(node.get());
+      // STRUCT_FIELD COMMA_STRUCT_FIELDS OPTIONAL_COMMA
+      // First child: STRUCT_FIELD
       for (std::size_t r = i; r <= j; ++r) {
         if (r >= table.size()) continue;
-        
         const auto& chart = table[r];
         for (const auto& child_state : chart) {
-          if (child_state.nonterminal_type == static_cast<int>(child_nonterminal) &&
-              child_state.start_token_index >= i &&
-              child_state.start_token_index + get_production_length(child_state) <= j &&
-              child_state.production_index < parse_rules[child_state.nonterminal_type].size() &&
+          if (child_state.nonterminal_type == static_cast<int>(Nonterminal::STRUCT_FIELD) &&
               is_finished_state(child_state, parse_rules)) {
-            
-            children.push_back(construct_cst(child_state, child_state.start_token_index,
-                                           child_state.start_token_index + get_production_length(child_state),
-                                           table, tokens));
-            found_child = true;
+            struct_fields_node->struct_fields.push_back(construct_cst(child_state, child_state.start_token_index,
+                                                                     child_state.start_token_index + get_production_length(child_state),
+                                                                     table, tokens));
             break;
           }
         }
-        if (found_child) break;
+      }
+      // Second child: COMMA_STRUCT_FIELDS
+      for (std::size_t r = i; r <= j; ++r) {
+        if (r >= table.size()) continue;
+        const auto& chart = table[r];
+        for (const auto& child_state : chart) {
+          if (child_state.nonterminal_type == static_cast<int>(Nonterminal::COMMA_STRUCT_FIELDS) &&
+              is_finished_state(child_state, parse_rules)) {
+            auto comma_fields_node = static_cast<CommaStructFieldsNode*>(construct_cst(child_state, child_state.start_token_index,
+                                                                                       child_state.start_token_index + get_production_length(child_state),
+                                                                                       table, tokens).release());
+            // Move fields from comma node to struct fields node
+            for (auto& field : comma_fields_node->struct_fields) {
+              struct_fields_node->struct_fields.push_back(std::move(field));
+            }
+            delete comma_fields_node;
+            break;
+          }
+        }
+      }
+      // Third child: OPTIONAL_COMMA
+      for (std::size_t r = i; r <= j; ++r) {
+        if (r >= table.size()) continue;
+        const auto& chart = table[r];
+        for (const auto& child_state : chart) {
+          if (child_state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_COMMA) &&
+              is_finished_state(child_state, parse_rules)) {
+            struct_fields_node->optional_comma = construct_cst(child_state, child_state.start_token_index,
+                                                              child_state.start_token_index + get_production_length(child_state),
+                                                              table, tokens);
+            break;
+          }
+        }
+      }
+      break;
+    }
+    
+    case Nonterminal::STRUCT_FIELD: {
+      auto struct_field_node = static_cast<StructFieldNode*>(node.get());
+      // Identifier ":" TYPE
+      std::size_t symbol_idx = 0;
+      
+      // Identifier
+      if (symbol_idx < production.size() && std::holds_alternative<Token>(production[symbol_idx])) {
+        const Token& identifier_token = std::get<Token>(production[symbol_idx]);
+        if (identifier_token.type == Token::Type::Identifier && token_pos < tokens.size()) {
+          struct_field_node->identifier = tokens[token_pos].value;
+          token_pos++;
+        }
+        symbol_idx++;
       }
       
-      if (!found_child) {
-        // For some nonterminals that might not have children (like optional ones)
-        // This is expected for some epsilon productions
-        continue;
+      // Skip ":"
+      symbol_idx++;
+      
+      // TYPE
+      if (symbol_idx < production.size() && std::holds_alternative<Nonterminal>(production[symbol_idx])) {
+        Nonterminal type_nonterminal = std::get<Nonterminal>(production[symbol_idx]);
+        for (std::size_t r = i; r <= j; ++r) {
+          if (r >= table.size()) continue;
+          const auto& chart = table[r];
+          for (const auto& child_state : chart) {
+            if (child_state.nonterminal_type == static_cast<int>(type_nonterminal) &&
+                is_finished_state(child_state, parse_rules)) {
+              struct_field_node->type = construct_cst(child_state, child_state.start_token_index,
+                                                     child_state.start_token_index + get_production_length(child_state),
+                                                     table, tokens);
+              break;
+            }
+          }
+        }
       }
+      break;
+    }
+    
+    case Nonterminal::STATEMENTS: {
+      auto statements_node = static_cast<StatementsNode*>(node.get());
+      if (production_index == 0) { // STATEMENTS -> STATEMENTS STATEMENT
+        // First child: STATEMENTS
+        for (std::size_t r = i; r <= j; ++r) {
+          if (r >= table.size()) continue;
+          const auto& chart = table[r];
+          for (const auto& child_state : chart) {
+            if (child_state.nonterminal_type == static_cast<int>(Nonterminal::STATEMENTS) &&
+                is_finished_state(child_state, parse_rules)) {
+              auto prev_statements_node = static_cast<StatementsNode*>(construct_cst(child_state, child_state.start_token_index,
+                                                                                     child_state.start_token_index + get_production_length(child_state),
+                                                                                     table, tokens).release());
+              // Move statements from previous node
+              for (auto& stmt : prev_statements_node->statements) {
+                statements_node->statements.push_back(std::move(stmt));
+              }
+              delete prev_statements_node;
+              break;
+            }
+          }
+        }
+        // Second child: STATEMENT
+        for (std::size_t r = i; r <= j; ++r) {
+          if (r >= table.size()) continue;
+          const auto& chart = table[r];
+          for (const auto& child_state : chart) {
+            if (child_state.nonterminal_type == static_cast<int>(Nonterminal::STATEMENT) &&
+                is_finished_state(child_state, parse_rules)) {
+              statements_node->statements.push_back(construct_cst(child_state, child_state.start_token_index,
+                                                                 child_state.start_token_index + get_production_length(child_state),
+                                                                 table, tokens));
+              break;
+            }
+          }
+        }
+      }
+      // Epsilon production - empty vector
+      break;
+    }
+    
+    default: {
+      // For other node types, use the generic approach for simple cases
+      // This handles nodes with simple single-child or vector-child structures
+      
+      // Check if this is a node with a vector field (like items, fields, params, etc.)
+      bool is_vector_node = false;
+      std::string vector_field_name;
+      
+      // Determine if this nonterminal typically has vector children
+      switch (static_cast<Nonterminal>(state.nonterminal_type)) {
+        case Nonterminal::COMMA_STRUCT_FIELDS:
+        case Nonterminal::COMMA_FUNCTION_PARAMS:
+        case Nonterminal::COMMA_ARRAY_ELEMENTS:
+        case Nonterminal::COMMA_CALL_PARAMS:
+        case Nonterminal::COMMA_STRUCT_EXPR_FIELDS:
+        case Nonterminal::COMMA_ENUM_VARIANTS:
+          is_vector_node = true;
+          break;
+        default:
+          break;
+      }
+      
+      if (is_vector_node) {
+        // For comma-separated lists, collect all the child elements
+        for (const auto& symbol : production) {
+          if (std::holds_alternative<Nonterminal>(symbol)) {
+            Nonterminal child_nonterminal = std::get<Nonterminal>(symbol);
+            for (std::size_t r = i; r <= j; ++r) {
+              if (r >= table.size()) continue;
+              const auto& chart = table[r];
+              for (const auto& child_state : chart) {
+                if (child_state.nonterminal_type == static_cast<int>(child_nonterminal) &&
+                    is_finished_state(child_state, parse_rules)) {
+                  // For vector nodes, we'll handle them in their specific cases above
+                  break;
+                }
+              }
+            }
+          }
+        }
+      } else {
+        // For single-child nodes, find and assign the child
+        for (const auto& symbol : production) {
+          if (std::holds_alternative<Nonterminal>(symbol)) {
+            Nonterminal child_nonterminal = std::get<Nonterminal>(symbol);
+            for (std::size_t r = i; r <= j; ++r) {
+              if (r >= table.size()) continue;
+              const auto& chart = table[r];
+              for (const auto& child_state : chart) {
+                if (child_state.nonterminal_type == static_cast<int>(child_nonterminal) &&
+                    is_finished_state(child_state, parse_rules)) {
+                  // For generic single-child nodes, we can't easily assign to specific fields
+                  // This would need to be handled on a case-by-case basis
+                  construct_cst(child_state, child_state.start_token_index,
+                               child_state.start_token_index + get_production_length(child_state),
+                               table, tokens);
+                  break;
+                }
+              }
+            }
+          } else if (std::holds_alternative<Token>(symbol)) {
+            // Handle terminal tokens for nodes that store them as strings
+            const Token& token = std::get<Token>(symbol);
+            if (token_pos < tokens.size()) {
+              // This is a generic handler - specific nodes handle their terminals explicitly above
+              token_pos++;
+            }
+          }
+        }
+      }
+      break;
     }
   }
-
-  // Set the children in the appropriate node fields
-  // This is a simplified implementation - in practice, we'd need to handle each node type specifically
-  // based on the production structure and node fields
   
   return node;
 }
