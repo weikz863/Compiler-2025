@@ -2,6 +2,7 @@
 #include <string>
 #include <string_view>
 #include <fstream>
+#include "parse_tree.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
 
@@ -16,7 +17,16 @@ int main(int argc, char* argv[]) {
   try {
     EarleyParser parser(std::move(tokens));
     if (parser.accepts()) {
-      std::cout << "Parsing successful!" << std::endl;
+      // Parse and construct the CST
+      auto cst = parser.parse();
+      if (cst) {
+        std::cout << "Parsing successful! CST constructed." << std::endl;
+        // In a real implementation, you could now traverse the CST
+        // using the visitor pattern or other tree traversal techniques
+      } else {
+        std::cout << "Parsing failed - unable to construct CST!" << std::endl;
+        return 1;
+      }
     } else {
       std::cout << "Parsing failed!" << std::endl;
       return 1;
