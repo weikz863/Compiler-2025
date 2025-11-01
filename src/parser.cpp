@@ -262,10 +262,50 @@ std::unique_ptr<TreeNode> create_nonterminal_node(Nonterminal nonterminal) {
       return std::make_unique<ItemNode>();
     case Nonterminal::FUNCTION:
       return std::make_unique<FunctionNode>();
+    case Nonterminal::OPTIONAL_CONST:
+      return std::make_unique<OptionalConstNode>();
+    case Nonterminal::FUNCTION_PARAMETERS:
+      return std::make_unique<FunctionParametersNode>();
+    case Nonterminal::SELF_PARAM:
+      return std::make_unique<SelfParamNode>();
+    case Nonterminal::SHORTHAND_SELF:
+      return std::make_unique<ShorthandSelfNode>();
+    case Nonterminal::TYPED_SELF:
+      return std::make_unique<TypedSelfNode>();
+    case Nonterminal::FUNCTION_PARAM:
+      return std::make_unique<FunctionParamNode>();
+    case Nonterminal::FUNCTION_RETURN_TYPE:
+      return std::make_unique<FunctionReturnTypeNode>();
+    case Nonterminal::OPTIONAL_FUNCTION_PARAMETERS:
+      return std::make_unique<OptionalFunctionParametersNode>();
+    case Nonterminal::OPTIONAL_COMMA:
+      return std::make_unique<OptionalCommaNode>();
+    case Nonterminal::COMMA_FUNCTION_PARAMS:
+      return std::make_unique<CommaFunctionParamsNode>();
+    case Nonterminal::OPTIONAL_FUNCTION_RETURN_TYPE:
+      return std::make_unique<OptionalFunctionReturnTypeNode>();
+    case Nonterminal::BLOCK_EXPRESSION_OR_SEMICOLON:
+      return std::make_unique<BlockExpressionOrSemicolonNode>();
     case Nonterminal::STRUCT:
       return std::make_unique<StructNode>();
+    case Nonterminal::STRUCT_FIELDS:
+      return std::make_unique<StructFieldsNode>();
+    case Nonterminal::STRUCT_FIELD:
+      return std::make_unique<StructFieldNode>();
+    case Nonterminal::OPTIONAL_STRUCT_FIELDS:
+      return std::make_unique<OptionalStructFieldsNode>();
+    case Nonterminal::COMMA_STRUCT_FIELDS:
+      return std::make_unique<CommaStructFieldsNode>();
     case Nonterminal::ENUMERATION:
       return std::make_unique<EnumerationNode>();
+    case Nonterminal::ENUM_VARIANTS:
+      return std::make_unique<EnumVariantsNode>();
+    case Nonterminal::ENUM_VARIANT:
+      return std::make_unique<EnumVariantNode>();
+    case Nonterminal::OPTIONAL_ENUM_VARIANTS:
+      return std::make_unique<OptionalEnumVariantsNode>();
+    case Nonterminal::COMMA_ENUM_VARIANTS:
+      return std::make_unique<CommaEnumVariantsNode>();
     case Nonterminal::CONSTANT_ITEM:
       return std::make_unique<ConstantItemNode>();
     case Nonterminal::TRAIT:
@@ -284,6 +324,8 @@ std::unique_ptr<TreeNode> create_nonterminal_node(Nonterminal nonterminal) {
       return std::make_unique<ExpressionStatementNode>();
     case Nonterminal::EXPRESSION:
       return std::make_unique<ExpressionNode>();
+    case Nonterminal::UNUSED1:
+      return std::make_unique<Unused1Node>();
     case Nonterminal::BASIC_EXPRESSION:
       return std::make_unique<BasicExpressionNode>();
     case Nonterminal::LITERAL_EXPRESSION:
@@ -294,14 +336,120 @@ std::unique_ptr<TreeNode> create_nonterminal_node(Nonterminal nonterminal) {
       return std::make_unique<GroupedExpressionNode>();
     case Nonterminal::ARRAY_EXPRESSION:
       return std::make_unique<ArrayExpressionNode>();
+    case Nonterminal::OPTIONAL_ARRAY_ELEMENTS:
+      return std::make_unique<OptionalArrayElementsNode>();
+    case Nonterminal::ARRAY_ELEMENTS:
+      return std::make_unique<ArrayElementsNode>();
+    case Nonterminal::COMMA_ARRAY_ELEMENTS:
+      return std::make_unique<CommaArrayElementsNode>();
     case Nonterminal::PATH_EXPRESSION:
       return std::make_unique<PathExpressionNode>();
     case Nonterminal::STRUCT_EXPRESSION:
       return std::make_unique<StructExpressionNode>();
-    
-    // Additional nodes
-    case Nonterminal::OPTIONAL_CONST:
-      return std::make_unique<OptionalConstNode>();
+    case Nonterminal::OPTIONAL_STRUCT_EXPR_FIELDS:
+      return std::make_unique<OptionalStructExprFieldsNode>();
+    case Nonterminal::STRUCT_EXPR_FIELDS:
+      return std::make_unique<StructExprFieldsNode>();
+    case Nonterminal::COMMA_STRUCT_EXPR_FIELDS:
+      return std::make_unique<CommaStructExprFieldsNode>();
+    case Nonterminal::STRUCT_EXPR_FIELD:
+      return std::make_unique<StructExprFieldNode>();
+    case Nonterminal::POSTFIX_EXPRESSION:
+      return std::make_unique<PostfixExpressionNode>();
+    case Nonterminal::METHOD_CALL_EXPRESSION:
+      return std::make_unique<MethodCallExpressionNode>();
+    case Nonterminal::OPTIONAL_CALL_PARAMS:
+      return std::make_unique<OptionalCallParamsNode>();
+    case Nonterminal::CALL_PARAMS:
+      return std::make_unique<CallParamsNode>();
+    case Nonterminal::COMMA_CALL_PARAMS:
+      return std::make_unique<CommaCallParamsNode>();
+    case Nonterminal::FIELD_EXPRESSION:
+      return std::make_unique<FieldExpressionNode>();
+    case Nonterminal::CALL_EXPRESSION:
+      return std::make_unique<CallExpressionNode>();
+    case Nonterminal::INDEX_EXPRESSION:
+      return std::make_unique<IndexExpressionNode>();
+    case Nonterminal::UNARY_OPERATOR_EXPRESSION:
+      return std::make_unique<UnaryOperatorExpressionNode>();
+    case Nonterminal::BORROW_EXPRESSION:
+      return std::make_unique<BorrowExpressionNode>();
+    case Nonterminal::DEREFERENCE_EXPRESSION:
+      return std::make_unique<DereferenceExpressionNode>();
+    case Nonterminal::NEGATION_EXPRESSION:
+      return std::make_unique<NegationExpressionNode>();
+    case Nonterminal::TYPE_CAST_EXPRESSION:
+      return std::make_unique<TypeCastExpressionNode>();
+    case Nonterminal::MULTIPLICATIVE_OPERATOR_EXPRESSION:
+      return std::make_unique<MultiplicativeOperatorExpressionNode>();
+    case Nonterminal::ADDITIVE_OPERATOR_EXPRESSION:
+      return std::make_unique<AdditiveOperatorExpressionNode>();
+    case Nonterminal::SHIFT_OPERATOR_EXPRESSION:
+      return std::make_unique<ShiftOperatorExpressionNode>();
+    case Nonterminal::AND_EXPRESSION:
+      return std::make_unique<AndExpressionNode>();
+    case Nonterminal::XOR_EXPRESSION:
+      return std::make_unique<XorExpressionNode>();
+    case Nonterminal::OR_EXPRESSION:
+      return std::make_unique<OrExpressionNode>();
+    case Nonterminal::COMPARISON_OPERATOR_EXPRESSION:
+      return std::make_unique<ComparisonOperatorExpressionNode>();
+    case Nonterminal::LAZY_AND_EXPRESSION:
+      return std::make_unique<LazyAndExpressionNode>();
+    case Nonterminal::LAZY_OR_EXPRESSION:
+      return std::make_unique<LazyOrExpressionNode>();
+    case Nonterminal::ASSIGNMENT_EXPRESSION:
+      return std::make_unique<AssignmentExpressionNode>();
+    case Nonterminal::SIMPLE_ASSIGNMENT_EXPRESSION:
+      return std::make_unique<SimpleAssignmentExpressionNode>();
+    case Nonterminal::COMPOUND_ASSIGNMENT_EXPRESSION:
+      return std::make_unique<CompoundAssignmentExpressionNode>();
+    case Nonterminal::FLOW_CONTROL_EXPRESSION:
+      return std::make_unique<FlowControlExpressionNode>();
+    case Nonterminal::CONTINUE_EXPRESSION:
+      return std::make_unique<ContinueExpressionNode>();
+    case Nonterminal::BREAK_EXPRESSION:
+      return std::make_unique<BreakExpressionNode>();
+    case Nonterminal::RETURN_EXPRESSION:
+      return std::make_unique<ReturnExpressionNode>();
+    case Nonterminal::EXPRESSION_WITH_BLOCK:
+      return std::make_unique<ExpressionWithBlockNode>();
+    case Nonterminal::BLOCK_EXPRESSION:
+      return std::make_unique<BlockExpressionNode>();
+    case Nonterminal::STATEMENTS:
+      return std::make_unique<StatementsNode>();
+    case Nonterminal::LOOP_EXPRESSION:
+      return std::make_unique<LoopExpressionNode>();
+    case Nonterminal::INFINITE_LOOP_EXPRESSION:
+      return std::make_unique<InfiniteLoopExpressionNode>();
+    case Nonterminal::PREDICATE_LOOP_EXPRESSION:
+      return std::make_unique<PredicateLoopExpressionNode>();
+    case Nonterminal::IF_EXPRESSION:
+      return std::make_unique<IfExpressionNode>();
+    case Nonterminal::CONDITIONS:
+      return std::make_unique<ConditionsNode>();
+    case Nonterminal::PATTERN:
+      return std::make_unique<PatternNode>();
+    case Nonterminal::IDENTIFIER_PATTERN:
+      return std::make_unique<IdentifierPatternNode>();
+    case Nonterminal::WILDCARD_PATTERN:
+      return std::make_unique<WildcardPatternNode>();
+    case Nonterminal::REFERENCE_PATTERN:
+      return std::make_unique<ReferencePatternNode>();
+    case Nonterminal::TYPE:
+      return std::make_unique<TypeNode>();
+    case Nonterminal::TYPE_PATH:
+      return std::make_unique<TypePathNode>();
+    case Nonterminal::REFERENCE_TYPE:
+      return std::make_unique<ReferenceTypeNode>();
+    case Nonterminal::ARRAY_TYPE:
+      return std::make_unique<ArrayTypeNode>();
+    case Nonterminal::UNIT_TYPE:
+      return std::make_unique<UnitTypeNode>();
+    case Nonterminal::PATH_IN_EXPRESSION:
+      return std::make_unique<PathInExpressionNode>();
+    case Nonterminal::PATH_EXPR_SEGMENT:
+      return std::make_unique<PathExprSegmentNode>();
       
     // All other nonterminals get stub implementations
     default:
