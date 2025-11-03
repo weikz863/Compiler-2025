@@ -4,6 +4,18 @@
 #include <algorithm>
 #include <optional>
 
+// Forward declarations for helper functions
+std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i, std::size_t j,
+                                       const std::vector<std::vector<ParsingState>>& table,
+                                       const std::vector<Token>& tokens);
+
+// Helper function to check if a state is finished (moved outside class)
+bool is_finished_state(const ParsingState& state, const std::array<std::vector<Production>, 97>& rules) {
+  const auto& productions = rules[state.nonterminal_type];
+  const auto& production = productions[state.production_index];
+  return state.position_in_production == production.size();
+}
+
 bool ParsingState::operator == (const ParsingState &other) const {
   return std::tie(nonterminal_type, production_index, position_in_production, start_token_index) ==
          std::tie(other.nonterminal_type, other.production_index, other.position_in_production, other.start_token_index);
@@ -193,8 +205,19 @@ std::unique_ptr<TreeNode> EarleyParser::parse() const {
     throw ParseError("Input cannot be parsed");
   }
 
-  // For now, return a simple CST root node to demonstrate the interface works
-  return std::make_unique<ItemsNode>();
+  // Find the completed ITEMS state in the final chart
+  const auto& final_chart = table.back();
+  for (const auto& state : final_chart) {
+    if (state.nonterminal_type == static_cast<int>(Nonterminal::ITEMS) &&
+        state.start_token_index == 0 && state.production_index == 0 &&
+        is_finished(state)) {
+      // Construct the CST using the completed parse state
+      return construct_cst(state, state.start_token_index, tokens.size(), table, tokens);
+    }
+  }
+  
+  // Fallback - should not reach here if accepts() returned true
+  throw ParseError("Unable to construct CST despite successful parse");
 }
 
 // Helper function to get production length
@@ -455,18 +478,6 @@ std::unique_ptr<TreeNode> create_nonterminal_node(Nonterminal nonterminal) {
     default:
       return std::make_unique<Unused1Node>();
   }
-}
-
-// Forward declarations for helper functions
-std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i, std::size_t j,
-                                       const std::vector<std::vector<ParsingState>>& table,
-                                       const std::vector<Token>& tokens);
-
-// Helper function to check if a state is finished (moved outside class)
-bool is_finished_state(const ParsingState& state, const std::array<std::vector<Production>, 97>& rules) {
-  const auto& productions = rules[state.nonterminal_type];
-  const auto& production = productions[state.production_index];
-  return state.position_in_production == production.size();
 }
 
 // Main parsing function that constructs the CST
