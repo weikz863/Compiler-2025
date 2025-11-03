@@ -3,6 +3,7 @@
 #ifndef _PARSE_TREE_HPP_
 #define _PARSE_TREE_HPP_
 #include <any>
+#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -233,6 +234,129 @@ public:
   virtual std::any visit(UnitTypeNode&) = 0;
   virtual std::any visit(PathInExpressionNode&) = 0;
   virtual std::any visit(PathExprSegmentNode&) = 0;
+};
+
+// Debug visitor that prints the tree structure
+class DebugTreeVisitor : public TreeVisitor {
+private:
+  int indent_level = 0;
+  
+  void print_indent() const;
+  void print_node_start(const std::string& node_type);
+  void print_node_with_value(const std::string& node_type, const std::string& value);
+  void print_node_end();
+  std::any visit_child(TreeNode* child);
+  void visit_children(const std::vector<std::unique_ptr<TreeNode>>& children);
+
+public:
+  // Terminals
+  std::any visit(IdentifierNode& node) override;
+  std::any visit(KeywordNode& node) override;
+  std::any visit(CharLiteralNode& node) override;
+  std::any visit(StringLiteralNode& node) override;
+  std::any visit(IntegerLiteralNode& node) override;
+  std::any visit(PunctuationNode& node) override;
+  std::any visit(WhitespaceNode& node) override;
+  std::any visit(CommentNode& node) override;
+  
+  // Nonterminals
+  std::any visit(ItemsNode& node) override;
+  std::any visit(ItemNode& node) override;
+  std::any visit(FunctionNode& node) override;
+  std::any visit(OptionalConstNode& node) override;
+  std::any visit(FunctionParametersNode& node) override;
+  std::any visit(SelfParamNode& node) override;
+  std::any visit(ShorthandSelfNode& node) override;
+  std::any visit(TypedSelfNode& node) override;
+  std::any visit(FunctionParamNode& node) override;
+  std::any visit(FunctionReturnTypeNode& node) override;
+  std::any visit(OptionalFunctionParametersNode& node) override;
+  std::any visit(OptionalCommaNode& node) override;
+  std::any visit(CommaFunctionParamsNode& node) override;
+  std::any visit(OptionalFunctionReturnTypeNode& node) override;
+  std::any visit(BlockExpressionOrSemicolonNode& node) override;
+  std::any visit(StructNode& node) override;
+  std::any visit(StructFieldsNode& node) override;
+  std::any visit(StructFieldNode& node) override;
+  std::any visit(OptionalStructFieldsNode& node) override;
+  std::any visit(CommaStructFieldsNode& node) override;
+  std::any visit(EnumerationNode& node) override;
+  std::any visit(EnumVariantsNode& node) override;
+  std::any visit(EnumVariantNode& node) override;
+  std::any visit(OptionalEnumVariantsNode& node) override;
+  std::any visit(CommaEnumVariantsNode& node) override;
+  std::any visit(ConstantItemNode& node) override;
+  std::any visit(TraitNode& node) override;
+  std::any visit(ImplementationNode& node) override;
+  std::any visit(InherentImplNode& node) override;
+  std::any visit(TraitImplNode& node) override;
+  std::any visit(StatementNode& node) override;
+  std::any visit(LetStatementNode& node) override;
+  std::any visit(ExpressionStatementNode& node) override;
+  std::any visit(ExpressionNode& node) override;
+  std::any visit(Unused1Node& node) override;
+  std::any visit(BasicExpressionNode& node) override;
+  std::any visit(LiteralExpressionNode& node) override;
+  std::any visit(UnderscoreExpressionNode& node) override;
+  std::any visit(GroupedExpressionNode& node) override;
+  std::any visit(ArrayExpressionNode& node) override;
+  std::any visit(OptionalArrayElementsNode& node) override;
+  std::any visit(ArrayElementsNode& node) override;
+  std::any visit(CommaArrayElementsNode& node) override;
+  std::any visit(PathExpressionNode& node) override;
+  std::any visit(StructExpressionNode& node) override;
+  std::any visit(OptionalStructExprFieldsNode& node) override;
+  std::any visit(StructExprFieldsNode& node) override;
+  std::any visit(CommaStructExprFieldsNode& node) override;
+  std::any visit(StructExprFieldNode& node) override;
+  std::any visit(PostfixExpressionNode& node) override;
+  std::any visit(MethodCallExpressionNode& node) override;
+  std::any visit(OptionalCallParamsNode& node) override;
+  std::any visit(CallParamsNode& node) override;
+  std::any visit(CommaCallParamsNode& node) override;
+  std::any visit(FieldExpressionNode& node) override;
+  std::any visit(CallExpressionNode& node) override;
+  std::any visit(IndexExpressionNode& node) override;
+  std::any visit(UnaryOperatorExpressionNode& node) override;
+  std::any visit(BorrowExpressionNode& node) override;
+  std::any visit(DereferenceExpressionNode& node) override;
+  std::any visit(NegationExpressionNode& node) override;
+  std::any visit(TypeCastExpressionNode& node) override;
+  std::any visit(MultiplicativeOperatorExpressionNode& node) override;
+  std::any visit(AdditiveOperatorExpressionNode& node) override;
+  std::any visit(ShiftOperatorExpressionNode& node) override;
+  std::any visit(AndExpressionNode& node) override;
+  std::any visit(XorExpressionNode& node) override;
+  std::any visit(OrExpressionNode& node) override;
+  std::any visit(ComparisonOperatorExpressionNode& node) override;
+  std::any visit(LazyAndExpressionNode& node) override;
+  std::any visit(LazyOrExpressionNode& node) override;
+  std::any visit(AssignmentExpressionNode& node) override;
+  std::any visit(SimpleAssignmentExpressionNode& node) override;
+  std::any visit(CompoundAssignmentExpressionNode& node) override;
+  std::any visit(FlowControlExpressionNode& node) override;
+  std::any visit(ContinueExpressionNode& node) override;
+  std::any visit(BreakExpressionNode& node) override;
+  std::any visit(ReturnExpressionNode& node) override;
+  std::any visit(ExpressionWithBlockNode& node) override;
+  std::any visit(BlockExpressionNode& node) override;
+  std::any visit(StatementsNode& node) override;
+  std::any visit(LoopExpressionNode& node) override;
+  std::any visit(InfiniteLoopExpressionNode& node) override;
+  std::any visit(PredicateLoopExpressionNode& node) override;
+  std::any visit(IfExpressionNode& node) override;
+  std::any visit(ConditionsNode& node) override;
+  std::any visit(PatternNode& node) override;
+  std::any visit(IdentifierPatternNode& node) override;
+  std::any visit(WildcardPatternNode& node) override;
+  std::any visit(ReferencePatternNode& node) override;
+  std::any visit(TypeNode& node) override;
+  std::any visit(TypePathNode& node) override;
+  std::any visit(ReferenceTypeNode& node) override;
+  std::any visit(ArrayTypeNode& node) override;
+  std::any visit(UnitTypeNode& node) override;
+  std::any visit(PathInExpressionNode& node) override;
+  std::any visit(PathExprSegmentNode& node) override;
 };
 
 // Terminals

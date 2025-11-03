@@ -21,8 +21,12 @@ int main(int argc, char* argv[]) {
       auto cst = parser.parse();
       if (cst) {
         std::cout << "Parsing successful! CST constructed." << std::endl;
-        // In a real implementation, you could now traverse the CST
-        // using the visitor pattern or other tree traversal techniques
+        
+        // Debug: Print the parse tree structure
+        DebugTreeVisitor debugVisitor;
+        std::cout << "\nParse tree structure:" << std::endl;
+        cst->accept(debugVisitor);
+        
       } else {
         std::cout << "Parsing failed - unable to construct CST!" << std::endl;
         return 1;
