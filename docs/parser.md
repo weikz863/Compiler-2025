@@ -11,7 +11,7 @@
 
 It also has compsrision operators to show rule precedence.
 
-`ParseError` is a class that represents an error in the parsing process. 
+`ParseError` is a class that represents an error in the parsing process.
 
 `EarleyParser` is a class that represents the Earley parser. The parsing algorithm is implemented in the class constructor.
 
