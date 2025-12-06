@@ -1,0 +1,10 @@
+Parse tree structure:
+ItemsNode
+ItemNode
+FunctionNode
+identifier: "main"
+OptionalConstNode
+(empty)
+PunctuationNode: "("
+PunctuationNode: ")"
+Unused1Node

@@ -5,20 +5,20 @@
 
 // Debug visitor implementation
 void DebugTreeVisitor::print_indent() const {
-  for (int i = 0; i < indent_level; ++i) {
-    std::cout << "  ";
-  }
+  // for (int i = 0; i < indent_level; ++i) {
+  //   out << "  ";
+  // }
 }
 
 void DebugTreeVisitor::print_node_start(const std::string& node_type) {
   print_indent();
-  std::cout << node_type << std::endl;
+  out << node_type << std::endl;
   indent_level++;
 }
 
 void DebugTreeVisitor::print_node_with_value(const std::string& node_type, const std::string& value) {
   print_indent();
-  std::cout << node_type << ": \"" << value << "\"" << std::endl;
+  out << node_type << ": \"" << value << "\"" << std::endl;
 }
 
 void DebugTreeVisitor::print_node_end() {
@@ -97,11 +97,12 @@ std::any DebugTreeVisitor::visit(ItemNode& node) {
 std::any DebugTreeVisitor::visit(FunctionNode& node) {
   print_node_start("FunctionNode");
   print_indent();
-  std::cout << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
   visit_child(node.optional_const.get());
   visit_child(node.optional_function_parameters.get());
   visit_child(node.optional_function_return_type.get());
   visit_child(node.block_expression_or_semicolon.get());
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
@@ -112,7 +113,7 @@ std::any DebugTreeVisitor::visit(OptionalConstNode& node) {
   } else {
     print_node_start("OptionalConstNode");
     print_indent();
-    std::cout << "(empty)" << std::endl;
+    out << "(empty)" << std::endl;
     print_node_end();
   }
   return std::any();
@@ -139,11 +140,11 @@ std::any DebugTreeVisitor::visit(SelfParamNode& node) {
 std::any DebugTreeVisitor::visit(ShorthandSelfNode& node) {
   print_node_start("ShorthandSelfNode");
   print_indent();
-  std::cout << "ampersand: \"" << node.ampersand << "\"" << std::endl;
+  out << "ampersand: \"" << node.ampersand << "\"" << std::endl;
   print_indent();
-  std::cout << "mut: \"" << node.mut << "\"" << std::endl;
+  out << "mut: \"" << node.mut << "\"" << std::endl;
   print_indent();
-  std::cout << "self: \"" << node.self << "\"" << std::endl;
+  out << "self: \"" << node.self << "\"" << std::endl;
   print_node_end();
   return std::any();
 }
@@ -151,9 +152,9 @@ std::any DebugTreeVisitor::visit(ShorthandSelfNode& node) {
 std::any DebugTreeVisitor::visit(TypedSelfNode& node) {
   print_node_start("TypedSelfNode");
   print_indent();
-  std::cout << "mut: \"" << node.mut << "\"" << std::endl;
+  out << "mut: \"" << node.mut << "\"" << std::endl;
   print_indent();
-  std::cout << "self: \"" << node.self << "\"" << std::endl;
+  out << "self: \"" << node.self << "\"" << std::endl;
   visit_child(node.type.get());
   print_node_end();
   return std::any();
@@ -187,7 +188,7 @@ std::any DebugTreeVisitor::visit(OptionalCommaNode& node) {
   } else {
     print_node_start("OptionalCommaNode");
     print_indent();
-    std::cout << "(empty)" << std::endl;
+    out << "(empty)" << std::endl;
     print_node_end();
   }
   return std::any();
@@ -211,7 +212,7 @@ std::any DebugTreeVisitor::visit(BlockExpressionOrSemicolonNode& node) {
   print_node_start("BlockExpressionOrSemicolonNode");
   if (!node.semicolon.empty()) {
     print_indent();
-    std::cout << "semicolon: \"" << node.semicolon << "\"" << std::endl;
+    out << "semicolon: \"" << node.semicolon << "\"" << std::endl;
   }
   visit_child(node.block_expression.get());
   print_node_end();
@@ -221,11 +222,11 @@ std::any DebugTreeVisitor::visit(BlockExpressionOrSemicolonNode& node) {
 std::any DebugTreeVisitor::visit(StructNode& node) {
   print_node_start("StructNode");
   print_indent();
-  std::cout << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
   visit_child(node.optional_struct_fields.get());
   if (!node.semicolon.empty()) {
     print_indent();
-    std::cout << "semicolon: \"" << node.semicolon << "\"" << std::endl;
+    out << "semicolon: \"" << node.semicolon << "\"" << std::endl;
   }
   print_node_end();
   return std::any();
@@ -242,7 +243,7 @@ std::any DebugTreeVisitor::visit(StructFieldsNode& node) {
 std::any DebugTreeVisitor::visit(StructFieldNode& node) {
   print_node_start("StructFieldNode");
   print_indent();
-  std::cout << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
   visit_child(node.type.get());
   print_node_end();
   return std::any();
@@ -265,7 +266,7 @@ std::any DebugTreeVisitor::visit(CommaStructFieldsNode& node) {
 std::any DebugTreeVisitor::visit(EnumerationNode& node) {
   print_node_start("EnumerationNode");
   print_indent();
-  std::cout << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
   visit_child(node.optional_enum_variants.get());
   print_node_end();
   return std::any();
@@ -282,7 +283,7 @@ std::any DebugTreeVisitor::visit(EnumVariantsNode& node) {
 std::any DebugTreeVisitor::visit(EnumVariantNode& node) {
   print_node_start("EnumVariantNode");
   print_indent();
-  std::cout << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
   print_node_end();
   return std::any();
 }
@@ -304,7 +305,7 @@ std::any DebugTreeVisitor::visit(CommaEnumVariantsNode& node) {
 std::any DebugTreeVisitor::visit(ConstantItemNode& node) {
   print_node_start("ConstantItemNode");
   print_indent();
-  std::cout << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
   visit_child(node.type.get());
   visit_child(node.expression.get());
   print_node_end();
@@ -314,7 +315,7 @@ std::any DebugTreeVisitor::visit(ConstantItemNode& node) {
 std::any DebugTreeVisitor::visit(TraitNode& node) {
   print_node_start("TraitNode");
   print_indent();
-  std::cout << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
   visit_child(node.items.get());
   print_node_end();
   return std::any();
@@ -339,7 +340,7 @@ std::any DebugTreeVisitor::visit(InherentImplNode& node) {
 std::any DebugTreeVisitor::visit(TraitImplNode& node) {
   print_node_start("TraitImplNode");
   print_indent();
-  std::cout << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
   visit_child(node.type.get());
   visit_child(node.items.get());
   print_node_end();
@@ -350,7 +351,7 @@ std::any DebugTreeVisitor::visit(StatementNode& node) {
   print_node_start("StatementNode");
   if (!node.semicolon.empty()) {
     print_indent();
-    std::cout << "semicolon: \"" << node.semicolon << "\"" << std::endl;
+    out << "semicolon: \"" << node.semicolon << "\"" << std::endl;
   }
   visit_child(node.item.get());
   visit_child(node.let_statement.get());
@@ -409,11 +410,11 @@ std::any DebugTreeVisitor::visit(LiteralExpressionNode& node) {
   visit_child(node.integer_literal.get());
   if (!node.true_keyword.empty()) {
     print_indent();
-    std::cout << "true_keyword: \"" << node.true_keyword << "\"" << std::endl;
+    out << "true_keyword: \"" << node.true_keyword << "\"" << std::endl;
   }
   if (!node.false_keyword.empty()) {
     print_indent();
-    std::cout << "false_keyword: \"" << node.false_keyword << "\"" << std::endl;
+    out << "false_keyword: \"" << node.false_keyword << "\"" << std::endl;
   }
   print_node_end();
   return std::any();
@@ -502,7 +503,7 @@ std::any DebugTreeVisitor::visit(CommaStructExprFieldsNode& node) {
 std::any DebugTreeVisitor::visit(StructExprFieldNode& node) {
   print_node_start("StructExprFieldNode");
   print_indent();
-  std::cout << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
   visit_child(node.expression.get());
   print_node_end();
   return std::any();
@@ -554,7 +555,7 @@ std::any DebugTreeVisitor::visit(FieldExpressionNode& node) {
   print_node_start("FieldExpressionNode");
   visit_child(node.postfix_expression.get());
   print_indent();
-  std::cout << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
   print_node_end();
   return std::any();
 }
@@ -588,9 +589,9 @@ std::any DebugTreeVisitor::visit(UnaryOperatorExpressionNode& node) {
 std::any DebugTreeVisitor::visit(BorrowExpressionNode& node) {
   print_node_start("BorrowExpressionNode");
   print_indent();
-  std::cout << "ampersand: \"" << node.ampersand << "\"" << std::endl;
+  out << "ampersand: \"" << node.ampersand << "\"" << std::endl;
   print_indent();
-  std::cout << "mut: \"" << node.mut << "\"" << std::endl;
+  out << "mut: \"" << node.mut << "\"" << std::endl;
   visit_child(node.unary_operator_expression.get());
   print_node_end();
   return std::any();
@@ -606,7 +607,7 @@ std::any DebugTreeVisitor::visit(DereferenceExpressionNode& node) {
 std::any DebugTreeVisitor::visit(NegationExpressionNode& node) {
   print_node_start("NegationExpressionNode");
   print_indent();
-  std::cout << "operator_: \"" << node.operator_ << "\"" << std::endl;
+  out << "operator_: \"" << node.operator_ << "\"" << std::endl;
   visit_child(node.unary_operator_expression.get());
   print_node_end();
   return std::any();
@@ -625,7 +626,7 @@ std::any DebugTreeVisitor::visit(MultiplicativeOperatorExpressionNode& node) {
   print_node_start("MultiplicativeOperatorExpressionNode");
   visit_child(node.type_cast_expression.get());
   print_indent();
-  std::cout << "operator_: \"" << node.operator_ << "\"" << std::endl;
+  out << "operator_: \"" << node.operator_ << "\"" << std::endl;
   visit_child(node.multiplicative_operator_expression.get());
   print_node_end();
   return std::any();
@@ -635,7 +636,7 @@ std::any DebugTreeVisitor::visit(AdditiveOperatorExpressionNode& node) {
   print_node_start("AdditiveOperatorExpressionNode");
   visit_child(node.multiplicative_operator_expression.get());
   print_indent();
-  std::cout << "operator_: \"" << node.operator_ << "\"" << std::endl;
+  out << "operator_: \"" << node.operator_ << "\"" << std::endl;
   visit_child(node.additive_operator_expression.get());
   print_node_end();
   return std::any();
@@ -645,7 +646,7 @@ std::any DebugTreeVisitor::visit(ShiftOperatorExpressionNode& node) {
   print_node_start("ShiftOperatorExpressionNode");
   visit_child(node.additive_operator_expression.get());
   print_indent();
-  std::cout << "operator_: \"" << node.operator_ << "\"" << std::endl;
+  out << "operator_: \"" << node.operator_ << "\"" << std::endl;
   visit_child(node.shift_operator_expression.get());
   print_node_end();
   return std::any();
@@ -679,7 +680,7 @@ std::any DebugTreeVisitor::visit(ComparisonOperatorExpressionNode& node) {
   print_node_start("ComparisonOperatorExpressionNode");
   visit_child(node.or_expression.get());
   print_indent();
-  std::cout << "operator_: \"" << node.operator_ << "\"" << std::endl;
+  out << "operator_: \"" << node.operator_ << "\"" << std::endl;
   visit_child(node.or_expression_right.get());
   print_node_end();
   return std::any();
@@ -722,7 +723,7 @@ std::any DebugTreeVisitor::visit(CompoundAssignmentExpressionNode& node) {
   print_node_start("CompoundAssignmentExpressionNode");
   visit_child(node.lazy_or_expression.get());
   print_indent();
-  std::cout << "operator_: \"" << node.operator_ << "\"" << std::endl;
+  out << "operator_: \"" << node.operator_ << "\"" << std::endl;
   visit_child(node.assignment_expression.get());
   print_node_end();
   return std::any();
@@ -834,14 +835,14 @@ std::any DebugTreeVisitor::visit(IdentifierPatternNode& node) {
   print_node_start("IdentifierPatternNode");
   if (!node.ref.empty()) {
     print_indent();
-    std::cout << "ref: \"" << node.ref << "\"" << std::endl;
+    out << "ref: \"" << node.ref << "\"" << std::endl;
   }
   if (!node.mut.empty()) {
     print_indent();
-    std::cout << "mut: \"" << node.mut << "\"" << std::endl;
+    out << "mut: \"" << node.mut << "\"" << std::endl;
   }
   print_indent();
-  std::cout << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
   print_node_end();
   return std::any();
 }
@@ -854,10 +855,10 @@ std::any DebugTreeVisitor::visit(WildcardPatternNode& node) {
 std::any DebugTreeVisitor::visit(ReferencePatternNode& node) {
   print_node_start("ReferencePatternNode");
   print_indent();
-  std::cout << "ampersand: \"" << node.ampersand << "\"" << std::endl;
+  out << "ampersand: \"" << node.ampersand << "\"" << std::endl;
   if (!node.mut.empty()) {
     print_indent();
-    std::cout << "mut: \"" << node.mut << "\"" << std::endl;
+    out << "mut: \"" << node.mut << "\"" << std::endl;
   }
   visit_child(node.pattern.get());
   print_node_end();
@@ -885,7 +886,7 @@ std::any DebugTreeVisitor::visit(ReferenceTypeNode& node) {
   print_node_start("ReferenceTypeNode");
   if (!node.mut.empty()) {
     print_indent();
-    std::cout << "mut: \"" << node.mut << "\"" << std::endl;
+    out << "mut: \"" << node.mut << "\"" << std::endl;
   }
   visit_child(node.type.get());
   print_node_end();
@@ -917,10 +918,10 @@ std::any DebugTreeVisitor::visit(PathInExpressionNode& node) {
 std::any DebugTreeVisitor::visit(PathExprSegmentNode& node) {
   print_node_start("PathExprSegmentNode");
   print_indent();
-  std::cout << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
   if (!node.self_keyword.empty()) {
     print_indent();
-    std::cout << "self_keyword: \"" << node.self_keyword << "\"" << std::endl;
+    out << "self_keyword: \"" << node.self_keyword << "\"" << std::endl;
   }
   print_node_end();
   return std::any();

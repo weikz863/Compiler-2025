@@ -1,0 +1,4 @@
+/home/nginxson/projects/Compiler-2025/CMakeFiles/project_library.dir
+/home/nginxson/projects/Compiler-2025/CMakeFiles/main.dir
+/home/nginxson/projects/Compiler-2025/CMakeFiles/edit_cache.dir
+/home/nginxson/projects/Compiler-2025/CMakeFiles/rebuild_cache.dir

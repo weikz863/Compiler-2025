@@ -13,8 +13,9 @@ class TreeVisitor;
 // Base TreeNode class
 class TreeNode {
 public:
-  virtual ~TreeNode() = default;
-  virtual std::any accept(TreeVisitor&) = 0;
+   virtual ~TreeNode() = default;
+   virtual std::any accept(TreeVisitor&) = 0;
+   std::vector<std::unique_ptr<TreeNode>> children;
 };
 
 // Forward declarations for all node types
@@ -240,7 +241,8 @@ public:
 class DebugTreeVisitor : public TreeVisitor {
 private:
   int indent_level = 0;
-  
+  std::ostream& out;
+
   void print_indent() const;
   void print_node_start(const std::string& node_type);
   void print_node_with_value(const std::string& node_type, const std::string& value);
@@ -249,6 +251,7 @@ private:
   void visit_children(const std::vector<std::unique_ptr<TreeNode>>& children);
 
 public:
+  DebugTreeVisitor(std::ostream& o = std::cout) : indent_level(0), out(o) {}
   // Terminals
   std::any visit(IdentifierNode& node) override;
   std::any visit(KeywordNode& node) override;

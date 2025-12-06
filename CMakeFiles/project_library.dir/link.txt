@@ -1,0 +1,2 @@
+/usr/bin/ar qc libproject_library.a CMakeFiles/project_library.dir/src/lexer.cpp.o CMakeFiles/project_library.dir/src/parse_rules.cpp.o CMakeFiles/project_library.dir/src/parser.cpp.o CMakeFiles/project_library.dir/src/parse_tree.cpp.o
+/usr/bin/ranlib libproject_library.a

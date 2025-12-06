@@ -2,6 +2,7 @@
 #include <string>
 #include <string_view>
 #include <fstream>
+#include <sstream>
 #include "parse_tree.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
@@ -21,12 +22,14 @@ int main(int argc, char* argv[]) {
       auto cst = parser.parse();
       if (cst) {
         std::cout << "Parsing successful! CST constructed." << std::endl;
-        
-        // Debug: Print the parse tree structure
-        DebugTreeVisitor debugVisitor;
-        std::cout << "\nParse tree structure:" << std::endl;
+
+        // Debug: Print the parse tree structure to file
+        std::ofstream out("parse_tree.txt");
+        DebugTreeVisitor debugVisitor(out);
+        out << "Parse tree structure:" << std::endl;
         cst->accept(debugVisitor);
-        
+        out.close();
+
       } else {
         std::cout << "Parsing failed - unable to construct CST!" << std::endl;
         return 1;
