@@ -16,3 +16,29 @@ It also has compsrision operators to show rule precedence.
 `EarleyParser` is a class that represents the Earley parser. The parsing algorithm is implemented in the class constructor.
 
 The `Parse` method is used to generate the parse tree (CST). It reads the parsing table of the Earley parsing method, determines how every terminal and nonterminal symbol in the input string is derived, and constructs the parse tree by creating the appropriate `CSTNode` and linking every terminal and nonterminal used in its derivation to it as a child. It returns a `std::unique_ptr<CSTNode>` object that represents the root of the parse tree. The parse tree contains complete information about the input string, including every terminal and nonterminal symbol in the input string, as well as the production rules used to derive each nonterminal symbol. The information is stored in the `CSTNode` class, which is defined in `parse_tree.hpp`. The information about how each terminal and nonterminal symbol is derived can be recovered completely using the `DebugTreeVisitor`.
+
+The `Parse` method detailed implementation algorithm pseudocode:
+
+```cpp
+// pseudocode that ensures a rightmost derivation and correct rule precedence
+// adapted from *A Second Course in Formal Languanges and Automata Theory*
+// PARSE(A -> β•, i, j) 
+// /* Finds a rightmost derivation of w[i+1 ... j] starting with production A -> β• */
+//     If β = X1 X2 ... Xm, set k := m and l := j
+//     Repeat until k = 0:
+//         If Xk is terminal:
+//             set k := k - 1 and l := l - 1
+//             save node(Xk) as subtree(Xk)
+//         Else Xk is nonterminal:
+//             for each production Xk -> γ•, tried in order:
+//                 find maximum possible r such that Xk -> γ• in [r, l]
+//                   and A -> X1 X2 ... Xk-1 • Xk ... Xm in [i, r] if exists
+//                 if found, break
+//             Call PARSE(Xk -> γ•, r, l)
+//             save the returned subtree as subtree(Xk)
+//         Set k := k - 1 and l := r
+//     r = new node of type A
+//     for i = 1 ... m:
+//         set appropriate child of r to subtree(Xi)
+//     return r
+```
