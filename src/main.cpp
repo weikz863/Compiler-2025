@@ -15,6 +15,11 @@ int main(int argc, char* argv[]) {
 
   auto tokens = lex(std::string_view(content));
 
+  std::cout << "Tokens:" << std::endl;
+  for (const auto& token : tokens) {
+    std::cout << "Type: " << static_cast<int>(token.type) << ", Value: '" << token.value << "'" << std::endl;
+  }
+
   try {
     EarleyParser parser(std::move(tokens));
     if (parser.accepts()) {

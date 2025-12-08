@@ -5,9 +5,9 @@
 
 // Debug visitor implementation
 void DebugTreeVisitor::print_indent() const {
-  // for (int i = 0; i < indent_level; ++i) {
-  //   out << "  ";
-  // }
+  for (int i = 0; i < indent_level; ++i) {
+    out << "  ";
+  }
 }
 
 void DebugTreeVisitor::print_node_start(const std::string& node_type) {
@@ -97,17 +97,18 @@ std::any DebugTreeVisitor::visit(ItemNode& node) {
 std::any DebugTreeVisitor::visit(FunctionNode& node) {
   print_node_start("FunctionNode");
   print_indent();
-  out << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "identifier: \"test\"" << std::endl;
+  out << "before visit_child optional_const" << std::endl;
   visit_child(node.optional_const.get());
   visit_child(node.optional_function_parameters.get());
   visit_child(node.optional_function_return_type.get());
   visit_child(node.block_expression_or_semicolon.get());
-  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(OptionalConstNode& node) {
+  out << "visiting OptionalConstNode" << std::endl;
   if (!node.value.empty()) {
     print_node_with_value("OptionalConstNode", node.value);
   } else {
