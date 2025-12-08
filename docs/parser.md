@@ -42,3 +42,5 @@ The `Parse` method detailed implementation algorithm pseudocode:
 //         set appropriate child of r to subtree(Xi)
 //     return r
 ```
+
+The CST created by the `Parse` method is a tree that represents the input string. It contains all the information about the input string, including every terminal and nonterminal symbol in the input string, as well as the production rules used to derive each nonterminal symbol. Every nonterminal should have a child for every symbol in its production rule.

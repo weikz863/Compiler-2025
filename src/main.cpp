@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
         out << "Parse tree structure:" << std::endl;
         cst->accept(debugVisitor);
         out.close();
+        std::cout << "CST constructed successfully." << std::endl;
 
       } else {
         std::cout << "Parsing failed - unable to construct CST!" << std::endl;

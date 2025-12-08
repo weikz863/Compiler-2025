@@ -6,8 +6,8 @@
 
 // Forward declarations for helper functions
 std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i, std::size_t j,
-                                       const std::vector<std::vector<ParsingState>>& table,
-                                       const std::vector<Token>& tokens);
+                                        const std::vector<std::vector<ParsingState>>& table,
+                                        const std::vector<Token>& tokens, int depth = 0);
 
 // Helper function to check if a state is finished (moved outside class)
 bool is_finished_state(const ParsingState& state, const std::array<std::vector<Production>, 97>& rules) {
@@ -212,7 +212,7 @@ std::unique_ptr<TreeNode> EarleyParser::parse() const {
         state.start_token_index == 0 && state.production_index == 0 &&
         is_finished(state)) {
       // Construct the CST using the completed parse state
-      return construct_cst(state, state.start_token_index, tokens.size(), table, tokens);
+      return construct_cst(state, state.start_token_index, tokens.size(), table, tokens, 0);
     }
   }
   
@@ -482,30 +482,32 @@ std::unique_ptr<TreeNode> create_nonterminal_node(Nonterminal nonterminal) {
 
 // Main parsing function that constructs the CST
 std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i, std::size_t j,
-                                        const std::vector<std::vector<ParsingState>>& table,
-                                        const std::vector<Token>& tokens) {
-   const auto& productions = parse_rules[state.nonterminal_type];
-   const auto& production = productions[state.production_index];
+                                         const std::vector<std::vector<ParsingState>>& table,
+                                         const std::vector<Token>& tokens, int depth) {
+    if (i > j || depth > 100) return std::make_unique<Unused1Node>();
 
-   // Handle epsilon productions
-   if (production.empty()) {
-     // For epsilon productions, return appropriate node based on context
-     if (state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_CONST)) {
-       auto node = std::make_unique<OptionalConstNode>();
-       node->value = ""; // empty string for epsilon
-   return node;
-     }
-     // For ITEMS epsilon production, return empty ItemsNode
-     if (state.nonterminal_type == static_cast<int>(Nonterminal::ITEMS)) {
-       auto node = std::make_unique<ItemsNode>();
-       return node;
-     }
-     // Add other epsilon production handlers as needed
-     return std::make_unique<Unused1Node>();
-   }
+    const auto& productions = parse_rules[state.nonterminal_type];
+    const auto& production = productions[state.production_index];
 
-   // Create the appropriate node for this nonterminal
-   auto node = create_nonterminal_node(static_cast<Nonterminal>(state.nonterminal_type));
+    // Handle epsilon productions
+    if (production.empty()) {
+      // For epsilon productions, return appropriate node based on context
+      if (state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_CONST)) {
+        auto node = std::make_unique<OptionalConstNode>();
+        node->value = ""; // empty string for epsilon
+    return node;
+      }
+      // For ITEMS epsilon production, return empty ItemsNode
+      if (state.nonterminal_type == static_cast<int>(Nonterminal::ITEMS)) {
+        auto node = std::make_unique<ItemsNode>();
+        return node;
+      }
+      // Add other epsilon production handlers as needed
+      return std::make_unique<Unused1Node>();
+    }
+
+    // Create the appropriate node for this nonterminal
+    auto node = create_nonterminal_node(static_cast<Nonterminal>(state.nonterminal_type));
 
    // Special handling for ITEMS
    if (state.nonterminal_type == static_cast<int>(Nonterminal::ITEMS)) {
@@ -534,7 +536,7 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
                       s.start_token_index == i && is_finished_state(s, parse_rules);
              });
              if (items_it != table[k].end()) {
-               items_node->items.push_back(construct_cst(*items_it, i, k, table, tokens));
+               items_node->items.push_back(construct_cst(*items_it, i, k, table, tokens, depth + 1));
              }
            }
            // Add the ITEM child
@@ -543,7 +545,7 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
                     s.start_token_index == k && is_finished_state(s, parse_rules);
            });
            if (item_it != table[j].end()) {
-             items_node->items.push_back(construct_cst(*item_it, k, j, table, tokens));
+             items_node->items.push_back(construct_cst(*item_it, k, j, table, tokens, depth + 1));
            }
            break;
          }
@@ -555,6 +557,7 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
 
    // Build child nodes by iterating through the production symbols
    std::size_t token_pos = i;
+   std::size_t symbol_index = 0;
 
    for (const auto& symbol : production) {
      if (std::holds_alternative<Token>(symbol)) {
@@ -566,28 +569,35 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
          node->children.push_back(std::move(terminal_node));
          token_pos++;
        }
+       symbol_index++;
      } else if (std::holds_alternative<Nonterminal>(symbol)) {
        // Nonterminal symbol - find the child state and recursively construct
        Nonterminal child_nonterminal = std::get<Nonterminal>(symbol);
 
        // Find finished state for this nonterminal starting at token_pos
-       for (std::size_t k = token_pos; k <= j; ++k) {
-         if (k >= table.size()) continue;
-         const auto& chart = table[k];
+       std::optional<std::pair<ParsingState, std::size_t>> found;
+       for (int chart_k = j; chart_k >= (int)token_pos; --chart_k) {
+         if ((std::size_t)chart_k >= table.size()) continue;
+         const auto& chart = table[chart_k];
          for (const auto& child_state : chart) {
            if (child_state.nonterminal_type == static_cast<int>(child_nonterminal) &&
                child_state.start_token_index == token_pos &&
                is_finished_state(child_state, parse_rules)) {
-             // Found the child state
-             std::size_t child_length = get_production_length(child_state);
-             auto child_node = construct_cst(child_state, token_pos, token_pos + child_length, table, tokens);
-             node->children.push_back(std::move(child_node));
-             token_pos += child_length;
-             goto next_symbol;
+             if (!found || (std::size_t)chart_k > found->second) {
+               found = {child_state, (std::size_t)chart_k};
+             }
            }
          }
        }
-       next_symbol:;
+       if (found) {
+         auto [child_state, chart_k] = *found;
+         auto child_node = construct_cst(child_state, token_pos, chart_k, table, tokens, depth + 1);
+         node->children.push_back(std::move(child_node));
+         token_pos = chart_k;
+       } else {
+         node->children.push_back(create_nonterminal_node(child_nonterminal));
+       }
+       symbol_index++;
      }
    }
 

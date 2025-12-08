@@ -242,6 +242,7 @@ class DebugTreeVisitor : public TreeVisitor {
 private:
   int indent_level = 0;
   std::ostream& out;
+  const int max_depth = 100;
 
   void print_indent() const;
   void print_node_start(const std::string& node_type);

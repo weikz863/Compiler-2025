@@ -26,7 +26,7 @@ void DebugTreeVisitor::print_node_end() {
 }
 
 std::any DebugTreeVisitor::visit_child(TreeNode* child) {
-  if (child) {
+  if (child && indent_level < max_depth) {
     return child->accept(*this);
   }
   return std::any();
@@ -97,8 +97,8 @@ std::any DebugTreeVisitor::visit(ItemNode& node) {
 std::any DebugTreeVisitor::visit(FunctionNode& node) {
   print_node_start("FunctionNode");
   print_indent();
-  out << "identifier: \"test\"" << std::endl;
-  out << "before visit_child optional_const" << std::endl;
+  out << "identifier: \"" << node.identifier << "\"" << std::endl;
+  out << "visiting function, optional_function_parameters is " << (node.optional_function_parameters ? "not null" : "null") << std::endl;
   visit_child(node.optional_const.get());
   visit_child(node.optional_function_parameters.get());
   visit_child(node.optional_function_return_type.get());
@@ -177,8 +177,14 @@ std::any DebugTreeVisitor::visit(FunctionReturnTypeNode& node) {
 }
 
 std::any DebugTreeVisitor::visit(OptionalFunctionParametersNode& node) {
+  out << "visiting OptionalFunctionParametersNode" << std::endl;
   print_node_start("OptionalFunctionParametersNode");
-  visit_child(node.function_parameters.get());
+  if (!node.function_parameters) {
+    print_indent();
+    out << "(empty)" << std::endl;
+  } else {
+    visit_child(node.function_parameters.get());
+  }
   print_node_end();
   return std::any();
 }
