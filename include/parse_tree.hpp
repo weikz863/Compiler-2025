@@ -250,6 +250,7 @@ private:
   void print_node_end();
   std::any visit_child(TreeNode* child);
   void visit_children(const std::vector<std::unique_ptr<TreeNode>>& children);
+  void visit_children(const std::vector<TreeNode*>& children);
 
 public:
   DebugTreeVisitor(std::ostream& o = std::cout) : indent_level(0), out(o) {}
@@ -421,17 +422,17 @@ public:
 class ItemNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::unique_ptr<TreeNode> item;
+  TreeNode* item;
 };
 
 class FunctionNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::unique_ptr<TreeNode> optional_const;
+  TreeNode* optional_const;
   std::string identifier;
-  std::unique_ptr<TreeNode> optional_function_parameters;
-  std::unique_ptr<TreeNode> optional_function_return_type;
-  std::unique_ptr<TreeNode> block_expression_or_semicolon;
+  TreeNode* optional_function_parameters;
+  TreeNode* optional_function_return_type;
+  TreeNode* block_expression_or_semicolon;
 };
 
 class OptionalConstNode : public TreeNode {
@@ -443,17 +444,17 @@ public:
 class FunctionParametersNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::unique_ptr<TreeNode> self_param;
-  std::unique_ptr<TreeNode> optional_comma;
-  std::vector<std::unique_ptr<TreeNode>> function_params;
-  std::unique_ptr<TreeNode> comma_function_params;
+  TreeNode* self_param;
+  TreeNode* optional_comma;
+  std::vector<TreeNode*> function_params;
+  TreeNode* comma_function_params;
 };
 
 class SelfParamNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::unique_ptr<TreeNode> shorthand_self;
-  std::unique_ptr<TreeNode> typed_self;
+  TreeNode* shorthand_self;
+  TreeNode* typed_self;
 };
 
 class ShorthandSelfNode : public TreeNode {
@@ -500,7 +501,7 @@ public:
 class CommaFunctionParamsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> function_params;
+  std::vector<TreeNode*> function_params;
 };
 
 class OptionalFunctionReturnTypeNode : public TreeNode {
@@ -978,14 +979,14 @@ public:
 class BlockExpressionNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::unique_ptr<TreeNode> statements;
-  std::unique_ptr<TreeNode> expression; // optional
+  TreeNode* statements;
+  TreeNode* expression; // optional
 };
 
 class StatementsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> statements;
+  std::vector<TreeNode*> statements;
 };
 
 class LoopExpressionNode : public TreeNode {

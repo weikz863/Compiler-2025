@@ -1,0 +1,552 @@
+Running pre-commit hook...
+Building project...
+Parsing successful!
+  ✓ comprehensive1.rx
+Parsing successful!
+  ✓ comprehensive2.rx
+Parsing successful!
+  ✓ comprehensive3.rx
+Parsing successful!
+  ✓ comprehensive4.rx
+Parsing successful!
+  ✓ comprehensive5.rx
+Parsing successful!
+  ✓ comprehensive6.rx
+Parsing successful!
+  ✓ comprehensive7.rx
+Parsing successful!
+  ✓ comprehensive8.rx
+Parsing successful!
+  ✓ comprehensive9.rx
+Parsing successful!
+  ✓ comprehensive10.rx
+Parsing successful!
+  ✓ comprehensive11.rx
+Parsing successful!
+  ✓ comprehensive12.rx
+Parsing successful!
+  ✓ comprehensive13.rx
+Parsing successful!
+  ✓ comprehensive14.rx
+Parsing successful!
+  ✓ comprehensive15.rx
+Parsing successful!
+  ✓ comprehensive16.rx
+Parsing successful!
+  ✓ comprehensive17.rx
+Parsing successful!
+  ✓ comprehensive18.rx
+Parsing successful!
+  ✓ comprehensive19.rx
+Parsing successful!
+  ✓ comprehensive20.rx
+Parsing successful!
+  ✓ comprehensive21.rx
+Parsing successful!
+  ✓ comprehensive22.rx
+Parsing successful!
+  ✓ comprehensive23.rx
+Parsing successful!
+  ✓ comprehensive24.rx
+Parsing successful!
+  ✓ comprehensive25.rx
+Parsing successful!
+  ✓ comprehensive26.rx
+Parsing successful!
+  ✓ comprehensive27.rx
+Parsing successful!
+  ✓ comprehensive28.rx
+Parsing successful!
+  ✓ comprehensive29.rx
+Parsing successful!
+  ✓ comprehensive30.rx
+Parsing successful!
+  ✓ comprehensive31.rx
+Parsing successful!
+  ✓ comprehensive32.rx
+Parsing successful!
+  ✓ comprehensive33.rx
+Parsing successful!
+  ✓ comprehensive34.rx
+Parsing successful!
+  ✓ comprehensive35.rx
+Parsing successful!
+  ✓ comprehensive36.rx
+Parsing successful!
+  ✓ comprehensive37.rx
+Parsing successful!
+  ✓ comprehensive38.rx
+Parsing successful!
+  ✓ comprehensive39.rx
+Parsing successful!
+  ✓ comprehensive40.rx
+Parsing successful!
+  ✓ comprehensive41.rx
+Parsing successful!
+  ✓ comprehensive42.rx
+Parsing successful!
+  ✓ comprehensive43.rx
+Parsing successful!
+  ✓ comprehensive44.rx
+Parsing successful!
+  ✓ comprehensive45.rx
+Parsing successful!
+  ✓ comprehensive46.rx
+Parsing successful!
+  ✓ comprehensive47.rx
+Parsing successful!
+  ✓ comprehensive48.rx
+Parsing successful!
+  ✓ comprehensive49.rx
+Parsing successful!
+  ✓ comprehensive50.rx
+Parsing successful!
+  ✗ return1.rx (allowed to fail)
+Parsing successful!
+  ✓ return2.rx
+Parsing failed!
+  ✓ return3.rx 
+Parsing successful!
+  ✗ return4.rx (allowed to fail)
+Parsing successful!
+  ✗ return5.rx (allowed to fail)
+Parsing successful!
+  ✗ return6.rx (allowed to fail)
+Parsing successful!
+  ✗ return7.rx (allowed to fail)
+Parsing successful!
+  ✓ return8.rx
+Parsing successful!
+  ✗ return9.rx (allowed to fail)
+Parsing successful!
+  ✗ return10.rx (allowed to fail)
+Parsing successful!
+  ✗ return11.rx (allowed to fail)
+Parsing successful!
+  ✓ return12.rx
+Parsing successful!
+  ✓ return13.rx
+Parsing successful!
+  ✓ return14.rx
+Parsing successful!
+  ✓ return15.rx
+Parsing successful!
+  ✓ array1.rx
+Parsing successful!
+  ✓ array2.rx
+Parsing successful!
+  ✓ array3.rx
+Parsing successful!
+  ✗ array4.rx (allowed to fail)
+Parsing successful!
+  ✗ array5.rx (allowed to fail)
+Parsing successful!
+  ✗ array6.rx (allowed to fail)
+Parsing successful!
+  ✗ array7.rx (allowed to fail)
+Parsing successful!
+  ✗ array8.rx (allowed to fail)
+Parsing successful!
+  ✓ if1.rx
+Parsing successful!
+  ✓ if2.rx
+Parsing successful!
+  ✓ if3.rx
+Parsing successful!
+  ✓ if4.rx
+Parsing successful!
+  ✓ if5.rx
+Parsing successful!
+  ✓ if6.rx
+Parsing successful!
+  ✓ if7.rx
+Parsing successful!
+  ✓ if8.rx
+Parsing successful!
+  ✓ if9.rx
+Parsing successful!
+  ✓ if10.rx
+Parsing successful!
+  ✗ if11.rx (allowed to fail)
+Parsing successful!
+  ✗ if12.rx (allowed to fail)
+Parsing successful!
+  ✗ if13.rx (allowed to fail)
+Parsing failed!
+  ✓ if14.rx 
+Parsing successful!
+  ✗ if15.rx (allowed to fail)
+Parsing successful!
+  ✓ loop1.rx
+Parsing successful!
+  ✓ loop2.rx
+Parsing successful!
+  ✓ loop3.rx
+Parsing successful!
+  ✓ loop5.rx
+Parsing successful!
+  ✗ loop6.rx (allowed to fail)
+Parsing successful!
+  ✗ loop7.rx (allowed to fail)
+Parsing failed!
+  ✓ loop8.rx 
+Parsing successful!
+  ✗ loop9.rx (allowed to fail)
+Parsing failed!
+  ✓ loop10.rx 
+Parsing successful!
+  ✓ basic1.rx
+Parsing successful!
+  ✗ basic2.rx (allowed to fail)
+Parsing successful!
+  ✗ basic3.rx (allowed to fail)
+Parsing successful!
+  ✓ basic4.rx
+Parsing successful!
+  ✓ basic5.rx
+Parsing successful!
+  ✗ basic6.rx (allowed to fail)
+Parsing successful!
+  ✗ basic7.rx (allowed to fail)
+Parsing successful!
+  ✗ basic8.rx (allowed to fail)
+Parsing successful!
+  ✗ basic9.rx (allowed to fail)
+Parsing successful!
+  ✓ basic10.rx
+Parsing successful!
+  ✓ basic11.rx
+Parsing successful!
+  ✗ basic12.rx (allowed to fail)
+Parsing failed!
+  ✓ basic13.rx 
+Parsing successful!
+  ✗ basic14.rx (allowed to fail)
+Parsing successful!
+  ✗ basic15.rx (allowed to fail)
+Parsing failed!
+  ✓ basic16.rx 
+Parsing successful!
+  ✓ basic17.rx
+Parsing successful!
+  ✓ basic18.rx
+Parsing successful!
+  ✓ basic19.rx
+Parsing successful!
+  ✓ basic20.rx
+Parsing successful!
+  ✓ basic21.rx
+Parsing successful!
+  ✓ basic22.rx
+Parsing successful!
+  ✓ basic23.rx
+Parsing successful!
+  ✓ basic24.rx
+Parsing successful!
+  ✓ basic25.rx
+Parsing successful!
+  ✓ basic26.rx
+Parsing successful!
+  ✓ basic27.rx
+Parsing failed!
+  ✓ basic28.rx 
+Parsing successful!
+  ✓ basic29.rx
+Parsing successful!
+  ✗ basic30.rx (allowed to fail)
+Parsing successful!
+  ✗ basic31.rx (allowed to fail)
+Parsing successful!
+  ✗ basic32.rx (allowed to fail)
+Parsing successful!
+  ✗ basic33.rx (allowed to fail)
+Parsing successful!
+  ✗ basic34.rx (allowed to fail)
+Parsing successful!
+  ✗ basic35.rx (allowed to fail)
+Parsing successful!
+  ✓ basic36.rx
+Parsing successful!
+  ✓ basic37.rx
+Parsing successful!
+  ✗ basic38.rx (allowed to fail)
+Parsing successful!
+  ✓ basic39.rx
+Parsing successful!
+  ✓ basic40.rx
+Parsing successful!
+  ✓ misc1.rx
+Parsing successful!
+  ✓ misc2.rx
+Parsing successful!
+  ✓ misc3.rx
+Parsing successful!
+  ✓ misc4.rx
+Parsing successful!
+  ✓ misc5.rx
+Parsing successful!
+  ✓ misc6.rx
+Parsing successful!
+  ✓ misc7.rx
+Parsing successful!
+  ✓ misc8.rx
+Parsing successful!
+  ✓ misc9.rx
+Parsing successful!
+  ✓ misc10.rx
+Parsing successful!
+  ✓ misc11.rx
+Parsing successful!
+  ✓ misc12.rx
+Parsing successful!
+  ✓ misc13.rx
+Parsing successful!
+  ✓ misc14.rx
+Parsing successful!
+  ✓ misc15.rx
+Parsing successful!
+  ✓ misc16.rx
+Parsing successful!
+  ✓ misc17.rx
+Parsing successful!
+  ✓ misc18.rx
+Parsing successful!
+  ✓ misc19.rx
+Parsing successful!
+  ✓ misc20.rx
+Parsing successful!
+  ✓ misc21.rx
+Parsing successful!
+  ✓ misc22.rx
+Parsing successful!
+  ✓ misc23.rx
+Parsing successful!
+  ✓ misc24.rx
+Parsing successful!
+  ✓ misc25.rx
+Parsing successful!
+  ✓ misc26.rx
+Parsing successful!
+  ✓ misc27.rx
+Parsing successful!
+  ✓ misc28.rx
+Parsing successful!
+  ✓ misc29.rx
+Parsing successful!
+  ✓ misc30.rx
+Parsing successful!
+  ✓ misc31.rx
+Parsing successful!
+  ✓ misc32.rx
+Parsing successful!
+  ✓ misc33.rx
+Parsing successful!
+  ✓ misc34.rx
+Parsing successful!
+  ✓ misc35.rx
+Parsing successful!
+  ✓ misc36.rx
+Parsing successful!
+  ✓ misc37.rx
+Parsing successful!
+  ✓ misc38.rx
+Parsing successful!
+  ✓ misc39.rx
+Parsing successful!
+  ✓ misc40.rx
+Parsing successful!
+  ✓ misc41.rx
+Parsing successful!
+  ✓ misc42.rx
+Parsing successful!
+  ✓ misc43.rx
+Parsing successful!
+  ✓ misc44.rx
+Parsing successful!
+  ✓ misc45.rx
+Parsing successful!
+  ✓ misc46.rx
+Parsing successful!
+  ✓ misc47.rx
+Parsing successful!
+  ✓ misc48.rx
+Parsing successful!
+  ✓ misc49.rx
+Parsing successful!
+  ✓ misc50.rx
+Parsing successful!
+  ✓ misc51.rx
+Parsing successful!
+  ✓ misc52.rx
+Parsing successful!
+  ✓ misc53.rx
+Parsing successful!
+  ✓ misc54.rx
+Parsing successful!
+  ✓ misc55.rx
+Parsing successful!
+  ✗ misc56.rx (allowed to fail)
+Parsing successful!
+  ✗ misc57.rx (allowed to fail)
+Parsing successful!
+  ✗ misc58.rx (allowed to fail)
+Parsing successful!
+  ✗ misc59.rx (allowed to fail)
+Parsing successful!
+  ✗ misc60.rx (allowed to fail)
+Parsing successful!
+  ✗ type1.rx (allowed to fail)
+Parsing successful!
+  ✗ type2.rx (allowed to fail)
+Parsing successful!
+  ✗ type3.rx (allowed to fail)
+Parsing successful!
+  ✗ type4.rx (allowed to fail)
+Parsing successful!
+  ✗ type5.rx (allowed to fail)
+Parsing successful!
+  ✗ type6.rx (allowed to fail)
+Parsing successful!
+  ✗ type7.rx (allowed to fail)
+Parsing successful!
+  ✗ type8.rx (allowed to fail)
+Parsing successful!
+  ✗ type9.rx (allowed to fail)
+Parsing successful!
+  ✗ type10.rx (allowed to fail)
+Parsing successful!
+  ✗ type11.rx (allowed to fail)
+Parsing successful!
+  ✗ type12.rx (allowed to fail)
+Parsing successful!
+  ✗ type13.rx (allowed to fail)
+Parsing successful!
+  ✗ type14.rx (allowed to fail)
+Parsing successful!
+  ✗ type15.rx (allowed to fail)
+Parsing successful!
+  ✗ type16.rx (allowed to fail)
+Parsing successful!
+  ✗ type17.rx (allowed to fail)
+Parsing successful!
+  ✗ type18.rx (allowed to fail)
+Parsing successful!
+  ✗ type19.rx (allowed to fail)
+Parsing successful!
+  ✗ type20.rx (allowed to fail)
+Parsing failed!
+  ✓ expr1.rx 
+Parsing failed!
+  ✓ expr2.rx 
+Parsing failed!
+  ✓ expr3.rx 
+Parsing successful!
+  ✗ expr4.rx (allowed to fail)
+Parsing failed!
+  ✓ expr5.rx 
+Parsing failed!
+  ✓ expr6.rx 
+Parsing failed!
+  ✓ expr7.rx 
+Parsing failed!
+  ✓ expr8.rx 
+Parsing failed!
+  ✓ expr9.rx 
+Parsing failed!
+  ✓ expr10.rx 
+Parsing failed!
+  ✓ expr11.rx 
+Parsing failed!
+  ✓ expr12.rx 
+Parsing successful!
+  ✓ expr13.rx
+Parsing successful!
+  ✗ expr14.rx (allowed to fail)
+Parsing failed!
+  ✓ expr15.rx 
+Parsing failed!
+  ✓ expr16.rx 
+Parsing successful!
+  ✓ expr17.rx
+Parsing failed!
+  ✓ expr18.rx 
+Parsing successful!
+  ✓ expr19.rx
+Parsing failed!
+  ✓ expr20.rx 
+Parsing failed!
+  ✓ expr21.rx 
+Parsing failed!
+  ✓ expr22.rx 
+Parsing failed!
+  ✓ expr23.rx 
+Parsing failed!
+  ✓ expr24.rx 
+Parsing failed!
+  ✓ expr25.rx 
+Parsing failed!
+  ✓ expr26.rx 
+Parsing failed!
+  ✓ expr27.rx 
+Parsing failed!
+  ✓ expr28.rx 
+Parsing failed!
+  ✓ expr29.rx 
+Parsing failed!
+  ✓ expr30.rx 
+Parsing failed!
+  ✓ expr31.rx 
+Parsing failed!
+  ✓ expr32.rx 
+Parsing successful!
+  ✓ expr33.rx
+Parsing successful!
+  ✓ expr34.rx
+Parsing successful!
+  ✗ expr35.rx (allowed to fail)
+Parsing successful!
+  ✓ expr36.rx
+Parsing successful!
+  ✗ expr37.rx (allowed to fail)
+Parsing successful!
+  ✓ expr38.rx
+Parsing failed!
+  ✓ expr39.rx 
+Parsing failed!
+  ✓ expr40.rx 
+Parsing successful!
+  ✗ misc61.rx (allowed to fail)
+Parsing successful!
+  ✗ misc62.rx (allowed to fail)
+Parsing successful!
+  ✗ misc63.rx (allowed to fail)
+Parsing successful!
+  ✗ misc64.rx (allowed to fail)
+Parsing successful!
+  ✓ misc65.rx
+Parsing successful!
+  ✓ autoref1.rx
+Parsing successful!
+  ✓ autoref2.rx
+Parsing successful!
+  ✓ autoref3.rx
+Parsing successful!
+  ✓ autoref4.rx
+Parsing successful!
+  ✓ autoref5.rx
+Parsing successful!
+  ✓ autoref6.rx
+Parsing successful!
+  ✗ autoref7.rx (allowed to fail)
+Parsing successful!
+  ✗ autoref8.rx (allowed to fail)
+Parsing successful!
+  ✓ autoref9.rx
+
+=== Test Results Summary ===
+Total tests: 271
+✓ Passed: 200
+✗ Failed: 0
+⚠️ Allowed to fail: 71
+
+All tests passed successfully!

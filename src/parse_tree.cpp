@@ -38,6 +38,12 @@ void DebugTreeVisitor::visit_children(const std::vector<std::unique_ptr<TreeNode
   }
 }
 
+void DebugTreeVisitor::visit_children(const std::vector<TreeNode*>& children) {
+  for (const auto& child : children) {
+    visit_child(child);
+  }
+}
+
 // Terminals
 std::any DebugTreeVisitor::visit(IdentifierNode& node) {
   print_node_with_value("IdentifierNode", node.value);
@@ -89,139 +95,98 @@ std::any DebugTreeVisitor::visit(ItemsNode& node) {
 
 std::any DebugTreeVisitor::visit(ItemNode& node) {
   print_node_start("ItemNode");
-  visit_child(node.item.get());
+  visit_child(node.item);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(FunctionNode& node) {
   print_node_start("FunctionNode");
-  print_indent();
-  out << "identifier: \"" << node.identifier << "\"" << std::endl;
-  out << "visiting function, optional_function_parameters is " << (node.optional_function_parameters ? "not null" : "null") << std::endl;
-  visit_child(node.optional_const.get());
-  visit_child(node.optional_function_parameters.get());
-  visit_child(node.optional_function_return_type.get());
-  visit_child(node.block_expression_or_semicolon.get());
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(OptionalConstNode& node) {
-  out << "visiting OptionalConstNode" << std::endl;
-  if (!node.value.empty()) {
-    print_node_with_value("OptionalConstNode", node.value);
-  } else {
-    print_node_start("OptionalConstNode");
-    print_indent();
-    out << "(empty)" << std::endl;
-    print_node_end();
-  }
+  print_node_start("OptionalConstNode");
+  visit_children(node.children);
+  print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(FunctionParametersNode& node) {
   print_node_start("FunctionParametersNode");
-  visit_child(node.self_param.get());
-  visit_child(node.optional_comma.get());
-  visit_children(node.function_params);
-  visit_child(node.comma_function_params.get());
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(SelfParamNode& node) {
   print_node_start("SelfParamNode");
-  visit_child(node.shorthand_self.get());
-  visit_child(node.typed_self.get());
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(ShorthandSelfNode& node) {
   print_node_start("ShorthandSelfNode");
-  print_indent();
-  out << "ampersand: \"" << node.ampersand << "\"" << std::endl;
-  print_indent();
-  out << "mut: \"" << node.mut << "\"" << std::endl;
-  print_indent();
-  out << "self: \"" << node.self << "\"" << std::endl;
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(TypedSelfNode& node) {
   print_node_start("TypedSelfNode");
-  print_indent();
-  out << "mut: \"" << node.mut << "\"" << std::endl;
-  print_indent();
-  out << "self: \"" << node.self << "\"" << std::endl;
-  visit_child(node.type.get());
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(FunctionParamNode& node) {
   print_node_start("FunctionParamNode");
-  visit_child(node.pattern.get());
-  visit_child(node.type.get());
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(FunctionReturnTypeNode& node) {
   print_node_start("FunctionReturnTypeNode");
-  visit_child(node.type.get());
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(OptionalFunctionParametersNode& node) {
-  out << "visiting OptionalFunctionParametersNode" << std::endl;
   print_node_start("OptionalFunctionParametersNode");
-  if (!node.function_parameters) {
-    print_indent();
-    out << "(empty)" << std::endl;
-  } else {
-    visit_child(node.function_parameters.get());
-  }
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(OptionalCommaNode& node) {
-  if (!node.value.empty()) {
-    print_node_with_value("OptionalCommaNode", node.value);
-  } else {
-    print_node_start("OptionalCommaNode");
-    print_indent();
-    out << "(empty)" << std::endl;
-    print_node_end();
-  }
+  print_node_start("OptionalCommaNode");
+  visit_children(node.children);
+  print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(CommaFunctionParamsNode& node) {
   print_node_start("CommaFunctionParamsNode");
-  visit_children(node.function_params);
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(OptionalFunctionReturnTypeNode& node) {
   print_node_start("OptionalFunctionReturnTypeNode");
-  visit_child(node.function_return_type.get());
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(BlockExpressionOrSemicolonNode& node) {
   print_node_start("BlockExpressionOrSemicolonNode");
-  if (!node.semicolon.empty()) {
-    print_indent();
-    out << "semicolon: \"" << node.semicolon << "\"" << std::endl;
-  }
-  visit_child(node.block_expression.get());
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
@@ -356,13 +321,7 @@ std::any DebugTreeVisitor::visit(TraitImplNode& node) {
 
 std::any DebugTreeVisitor::visit(StatementNode& node) {
   print_node_start("StatementNode");
-  if (!node.semicolon.empty()) {
-    print_indent();
-    out << "semicolon: \"" << node.semicolon << "\"" << std::endl;
-  }
-  visit_child(node.item.get());
-  visit_child(node.let_statement.get());
-  visit_child(node.expression_statement.get());
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
@@ -386,13 +345,14 @@ std::any DebugTreeVisitor::visit(ExpressionStatementNode& node) {
 
 std::any DebugTreeVisitor::visit(ExpressionNode& node) {
   print_node_start("ExpressionNode");
-  visit_child(node.flow_control_expression.get());
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(Unused1Node& node) {
   print_node_start("Unused1Node");
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
@@ -776,15 +736,14 @@ std::any DebugTreeVisitor::visit(ExpressionWithBlockNode& node) {
 
 std::any DebugTreeVisitor::visit(BlockExpressionNode& node) {
   print_node_start("BlockExpressionNode");
-  visit_child(node.statements.get());
-  visit_child(node.expression.get());
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }
 
 std::any DebugTreeVisitor::visit(StatementsNode& node) {
   print_node_start("StatementsNode");
-  visit_children(node.statements);
+  visit_children(node.children);
   print_node_end();
   return std::any();
 }

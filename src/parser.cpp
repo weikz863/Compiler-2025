@@ -605,39 +605,37 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
    if (state.nonterminal_type == static_cast<int>(Nonterminal::ITEM)) {
      auto item_node = static_cast<ItemNode*>(node.get());
      if (!node->children.empty()) {
-       item_node->item = std::move(node->children[0]);
-       node->children.clear();
+       item_node->item = node->children[0].get();
      }
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::FUNCTION)) {
      auto fn_node = static_cast<FunctionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 8) {
-       fn_node->optional_const = std::move(node->children[0]);
+       fn_node->optional_const = node->children[0].get();
        // children[1] is "fn", children[2] is Identifier
        fn_node->identifier = static_cast<IdentifierNode*>(node->children[2].get())->value;
        // children[3] is "(", children[4] is OPTIONAL_FUNCTION_PARAMETERS
-       fn_node->optional_function_parameters = std::move(node->children[4]);
+       fn_node->optional_function_parameters = node->children[4].get();
        // children[5] is ")", children[6] is OPTIONAL_FUNCTION_RETURN_TYPE
-       fn_node->optional_function_return_type = std::move(node->children[6]);
+       fn_node->optional_function_return_type = node->children[6].get();
        // children[7] is BLOCK_EXPRESSION_OR_SEMICOLON
-       fn_node->block_expression_or_semicolon = std::move(node->children[7]);
+       fn_node->block_expression_or_semicolon = node->children[7].get();
      }
-     node->children.clear();
+     // node->children.clear(); // don't clear to keep ownership
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::FUNCTION_PARAMETERS)) {
      auto fp_node = static_cast<FunctionParametersNode*>(node.get());
      if (state.production_index == 0) {
-       fp_node->self_param = std::move(node->children[0]);
-       fp_node->optional_comma = std::move(node->children[1]);
+       fp_node->self_param = node->children[0].get();
+       fp_node->optional_comma = node->children[1].get();
      } else if (state.production_index == 1) {
-       fp_node->function_params.push_back(std::move(node->children[0]));
-       fp_node->comma_function_params = std::move(node->children[1]);
-       fp_node->optional_comma = std::move(node->children[2]);
+       fp_node->function_params.push_back(node->children[0].get());
+       fp_node->comma_function_params = node->children[1].get();
+       fp_node->optional_comma = node->children[2].get();
      } else if (state.production_index == 2) {
-       fp_node->self_param = std::move(node->children[0]);
-       fp_node->function_params.push_back(std::move(node->children[2]));
-       fp_node->comma_function_params = std::move(node->children[3]);
-       fp_node->optional_comma = std::move(node->children[4]);
+       fp_node->self_param = node->children[0].get();
+       fp_node->function_params.push_back(node->children[2].get());
+       fp_node->comma_function_params = node->children[3].get();
+       fp_node->optional_comma = node->children[4].get();
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_CONST)) {
      auto oc_node = static_cast<OptionalConstNode*>(node.get());
      if (state.production_index == 0) {
@@ -645,15 +643,13 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else {
        oc_node->value = "";
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::SELF_PARAM)) {
      auto sp_node = static_cast<SelfParamNode*>(node.get());
      if (state.production_index == 0) {
-       sp_node->shorthand_self = std::move(node->children[0]);
+       sp_node->shorthand_self = node->children[0].get();
      } else {
-       sp_node->typed_self = std::move(node->children[0]);
+       sp_node->typed_self = node->children[0].get();
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::SHORTHAND_SELF)) {
      auto ss_node = static_cast<ShorthandSelfNode*>(node.get());
      if (state.production_index == 0) {
@@ -669,7 +665,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else {
        ss_node->self = "self";
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::TYPED_SELF)) {
      auto ts_node = static_cast<TypedSelfNode*>(node.get());
      if (state.production_index == 0) {
@@ -680,28 +675,23 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        ts_node->self = "self";
        ts_node->type = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::FUNCTION_PARAM)) {
      auto fparam_node = static_cast<FunctionParamNode*>(node.get());
      fparam_node->pattern = std::move(node->children[0]);
      fparam_node->type = std::move(node->children[2]);
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::FUNCTION_RETURN_TYPE)) {
      auto frt_node = static_cast<FunctionReturnTypeNode*>(node.get());
      frt_node->type = std::move(node->children[1]);
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_FUNCTION_PARAMETERS)) {
      auto ofp_node = static_cast<OptionalFunctionParametersNode*>(node.get());
      if (state.production_index == 0) {
        ofp_node->function_parameters = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_FUNCTION_RETURN_TYPE)) {
      auto ofrt_node = static_cast<OptionalFunctionReturnTypeNode*>(node.get());
      if (state.production_index == 0) {
        ofrt_node->function_return_type = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_COMMA)) {
      auto oc_node = static_cast<OptionalCommaNode*>(node.get());
      if (state.production_index == 0) {
@@ -709,15 +699,13 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else {
        oc_node->value = "";
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::COMMA_FUNCTION_PARAMS)) {
      auto cfp_node = static_cast<CommaFunctionParamsNode*>(node.get());
      if (state.production_index == 0) {
        auto prev = static_cast<CommaFunctionParamsNode*>(node->children[0].get());
-       cfp_node->function_params = std::move(prev->function_params);
-       cfp_node->function_params.push_back(std::move(node->children[2]));
+       cfp_node->function_params = prev->function_params;
+       cfp_node->function_params.push_back(node->children[2].get());
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::BLOCK_EXPRESSION_OR_SEMICOLON)) {
      auto beos_node = static_cast<BlockExpressionOrSemicolonNode*>(node.get());
      if (state.production_index == 0) {
@@ -726,30 +714,30 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else {
        beos_node->semicolon = static_cast<PunctuationNode*>(node->children[0].get())->value;
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::BLOCK_EXPRESSION)) {
      auto be_node = static_cast<BlockExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 4) {
-       be_node->statements = std::move(node->children[1]);
-       be_node->expression = std::move(node->children[2]);
+       be_node->statements = node->children[1].get();
+       be_node->expression = node->children[2].get();
      } else if (state.production_index == 1 && node->children.size() >= 3) {
-       be_node->statements = std::move(node->children[1]);
+       be_node->statements = node->children[1].get();
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::STATEMENTS)) {
      auto st_node = static_cast<StatementsNode*>(node.get());
-     if (state.production_index == 0 && node->children.size() >= 3) {
-       auto prev_st = static_cast<StatementsNode*>(node->children[0].get());
-       st_node->statements = std::move(prev_st->statements);
-       st_node->statements.push_back(std::move(node->children[2]));
+     if (state.production_index == 0) {
+       if (node->children.size() >= 3) {
+         auto prev_st = static_cast<StatementsNode*>(node->children[0].get());
+         st_node->statements = prev_st->statements;
+         st_node->statements.push_back(node->children[2].get());
+       } else if (node->children.size() >= 1) {
+         st_node->statements.push_back(node->children[0].get());
+       }
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::EXPRESSION)) {
      auto expr_node = static_cast<ExpressionNode*>(node.get());
      if (state.production_index == 0) {
        expr_node->flow_control_expression = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::FLOW_CONTROL_EXPRESSION)) {
      auto fce_node = static_cast<FlowControlExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -761,7 +749,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else if (state.production_index == 3) {
        fce_node->return_expression = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::ASSIGNMENT_EXPRESSION)) {
      auto ae_node = static_cast<AssignmentExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -771,18 +758,15 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else if (state.production_index == 2) {
        ae_node->compound_assignment_expression = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::SIMPLE_ASSIGNMENT_EXPRESSION)) {
      auto sae_node = static_cast<SimpleAssignmentExpressionNode*>(node.get());
      sae_node->lazy_or_expression = std::move(node->children[0]);
      sae_node->assignment_expression = std::move(node->children[2]);
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::COMPOUND_ASSIGNMENT_EXPRESSION)) {
      auto cae_node = static_cast<CompoundAssignmentExpressionNode*>(node.get());
      cae_node->lazy_or_expression = std::move(node->children[0]);
      cae_node->operator_ = static_cast<PunctuationNode*>(node->children[1].get())->value;
      cae_node->assignment_expression = std::move(node->children[2]);
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::LAZY_OR_EXPRESSION)) {
      auto lor_node = static_cast<LazyOrExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -791,7 +775,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        lor_node->lazy_and_expression = std::move(node->children[0]);
        lor_node->lazy_or_expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::LAZY_AND_EXPRESSION)) {
      auto land_node = static_cast<LazyAndExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -800,7 +783,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        land_node->comparison_operator_expression = std::move(node->children[0]);
        land_node->lazy_and_expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::COMPARISON_OPERATOR_EXPRESSION)) {
      auto coe_node = static_cast<ComparisonOperatorExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -810,7 +792,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        coe_node->operator_ = static_cast<PunctuationNode*>(node->children[1].get())->value;
        coe_node->or_expression_right = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::OR_EXPRESSION)) {
      auto or_node = static_cast<OrExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -819,7 +800,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        or_node->xor_expression = std::move(node->children[0]);
        or_node->or_expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::XOR_EXPRESSION)) {
      auto xor_node = static_cast<XorExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -828,7 +808,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        xor_node->and_expression = std::move(node->children[0]);
        xor_node->xor_expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::AND_EXPRESSION)) {
      auto and_node = static_cast<AndExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -837,7 +816,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        and_node->shift_operator_expression = std::move(node->children[0]);
        and_node->and_expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::SHIFT_OPERATOR_EXPRESSION)) {
      auto soe_node = static_cast<ShiftOperatorExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -847,7 +825,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        soe_node->operator_ = static_cast<PunctuationNode*>(node->children[1].get())->value;
        soe_node->shift_operator_expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::ADDITIVE_OPERATOR_EXPRESSION)) {
      auto aoe_node = static_cast<AdditiveOperatorExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -857,7 +834,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        aoe_node->operator_ = static_cast<PunctuationNode*>(node->children[1].get())->value;
        aoe_node->additive_operator_expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::MULTIPLICATIVE_OPERATOR_EXPRESSION)) {
      auto moe_node = static_cast<MultiplicativeOperatorExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -867,7 +843,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        moe_node->operator_ = static_cast<PunctuationNode*>(node->children[1].get())->value;
        moe_node->multiplicative_operator_expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::TYPE_CAST_EXPRESSION)) {
      auto tce_node = static_cast<TypeCastExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -877,7 +852,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        tce_node->type_cast_expression = std::move(node->children[1]);
        tce_node->type = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::UNARY_OPERATOR_EXPRESSION)) {
      auto uoe_node = static_cast<UnaryOperatorExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -889,7 +863,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else if (state.production_index == 3) {
        uoe_node->negation_expression = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::POSTFIX_EXPRESSION)) {
      auto pe_node = static_cast<PostfixExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -903,7 +876,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else if (state.production_index == 4) {
        pe_node->index_expression = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::BASIC_EXPRESSION)) {
      auto be_node = static_cast<BasicExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -921,7 +893,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else if (state.production_index == 6) {
        be_node->expression_with_block = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::LITERAL_EXPRESSION)) {
      auto le_node = static_cast<LiteralExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -935,16 +906,13 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else if (state.production_index == 4) {
        le_node->false_keyword = "false";
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::PATH_EXPRESSION)) {
      auto pe_node = static_cast<PathExpressionNode*>(node.get());
      if (state.production_index == 0) {
        pe_node->path_in_expression = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::UNIT_TYPE)) {
      // UnitTypeNode has no fields
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::PATH_IN_EXPRESSION)) {
      auto pie_node = static_cast<PathInExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -953,7 +921,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        pie_node->path_expr_segment = std::move(node->children[0]);
        pie_node->path_expr_segment2 = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::PATH_EXPR_SEGMENT)) {
      auto pes_node = static_cast<PathExprSegmentNode*>(node.get());
      if (state.production_index == 0) {
@@ -963,20 +930,17 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else if (state.production_index == 2) {
        pes_node->self_keyword = "self";
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::CALL_EXPRESSION)) {
      auto ce_node = static_cast<CallExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
        ce_node->postfix_expression = std::move(node->children[0]);
        ce_node->optional_call_params = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_CALL_PARAMS)) {
      auto ocp_node = static_cast<OptionalCallParamsNode*>(node.get());
      if (state.production_index == 0) {
        ocp_node->call_params = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::CALL_PARAMS)) {
      auto cp_node = static_cast<CallParamsNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
@@ -985,7 +949,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        cp_node->expressions.insert(cp_node->expressions.end(), std::make_move_iterator(ccp->expressions.begin()), std::make_move_iterator(ccp->expressions.end()));
        cp_node->optional_comma = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::COMMA_CALL_PARAMS)) {
      auto ccp_node = static_cast<CommaCallParamsNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
@@ -993,7 +956,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        ccp_node->expressions = std::move(prev_ccp->expressions);
        ccp_node->expressions.push_back(std::move(node->children[2]));
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::NEGATION_EXPRESSION)) {
      auto ne_node = static_cast<NegationExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 2) {
@@ -1003,7 +965,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        ne_node->operator_ = static_cast<PunctuationNode*>(node->children[0].get())->value;
        ne_node->unary_operator_expression = std::move(node->children[1]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::STRUCT)) {
      auto struct_node = static_cast<StructNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 5) {
@@ -1013,7 +974,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        struct_node->identifier = static_cast<IdentifierNode*>(node->children[1].get())->value;
        struct_node->semicolon = ";";
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::STRUCT_FIELDS)) {
      auto sf_node = static_cast<StructFieldsNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
@@ -1022,20 +982,17 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        sf_node->struct_fields.insert(sf_node->struct_fields.end(), std::make_move_iterator(csf->struct_fields.begin()), std::make_move_iterator(csf->struct_fields.end()));
        sf_node->optional_comma = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::STRUCT_FIELD)) {
      auto sf_node = static_cast<StructFieldNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
        sf_node->identifier = static_cast<IdentifierNode*>(node->children[0].get())->value;
        sf_node->type = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_STRUCT_FIELDS)) {
      auto osf_node = static_cast<OptionalStructFieldsNode*>(node.get());
      if (state.production_index == 0) {
        osf_node->struct_fields = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::COMMA_STRUCT_FIELDS)) {
      auto csf_node = static_cast<CommaStructFieldsNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
@@ -1043,14 +1000,12 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        csf_node->struct_fields = std::move(prev_csf->struct_fields);
        csf_node->struct_fields.push_back(std::move(node->children[2]));
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::ENUMERATION)) {
      auto enum_node = static_cast<EnumerationNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 4) {
        enum_node->identifier = static_cast<IdentifierNode*>(node->children[1].get())->value;
        enum_node->optional_enum_variants = std::move(node->children[3]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::ENUM_VARIANTS)) {
      auto ev_node = static_cast<EnumVariantsNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
@@ -1059,19 +1014,16 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        ev_node->enum_variants.insert(ev_node->enum_variants.end(), std::make_move_iterator(cev->enum_variants.begin()), std::make_move_iterator(cev->enum_variants.end()));
        ev_node->optional_comma = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::ENUM_VARIANT)) {
      auto ev_node = static_cast<EnumVariantNode*>(node.get());
      if (state.production_index == 0) {
        ev_node->identifier = static_cast<IdentifierNode*>(node->children[0].get())->value;
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_ENUM_VARIANTS)) {
      auto oev_node = static_cast<OptionalEnumVariantsNode*>(node.get());
      if (state.production_index == 0) {
        oev_node->enum_variants = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::COMMA_ENUM_VARIANTS)) {
      auto cev_node = static_cast<CommaEnumVariantsNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
@@ -1079,7 +1031,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        cev_node->enum_variants = std::move(prev_cev->enum_variants);
        cev_node->enum_variants.push_back(std::move(node->children[2]));
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::CONSTANT_ITEM)) {
      auto ci_node = static_cast<ConstantItemNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 6) {
@@ -1090,14 +1041,12 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        ci_node->identifier = static_cast<IdentifierNode*>(node->children[1].get())->value;
        ci_node->type = std::move(node->children[3]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::TRAIT)) {
      auto trait_node = static_cast<TraitNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 4) {
        trait_node->identifier = static_cast<IdentifierNode*>(node->children[1].get())->value;
        trait_node->items = std::move(node->children[3]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::IMPLEMENTATION)) {
      auto impl_node = static_cast<ImplementationNode*>(node.get());
      if (state.production_index == 0) {
@@ -1105,14 +1054,12 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else {
        impl_node->trait_impl = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::INHERENT_IMPL)) {
      auto ii_node = static_cast<InherentImplNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 4) {
        ii_node->type = std::move(node->children[1]);
        ii_node->items = std::move(node->children[3]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::TRAIT_IMPL)) {
      auto ti_node = static_cast<TraitImplNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 6) {
@@ -1120,7 +1067,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        ti_node->type = std::move(node->children[3]);
        ti_node->items = std::move(node->children[5]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::STATEMENT)) {
      auto stmt_node = static_cast<StatementNode*>(node.get());
      if (state.production_index == 0) {
@@ -1132,7 +1078,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else if (state.production_index == 3) {
        stmt_node->expression_statement = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::LET_STATEMENT)) {
      auto ls_node = static_cast<LetStatementNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 6) {
@@ -1143,7 +1088,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        ls_node->pattern = std::move(node->children[1]);
        ls_node->type = std::move(node->children[3]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::EXPRESSION_STATEMENT)) {
      auto es_node = static_cast<ExpressionStatementNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 2) {
@@ -1151,31 +1095,26 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else if (state.production_index == 1) {
        es_node->expression_with_block = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::UNDERSCORE_EXPRESSION)) {
      auto ue_node = static_cast<UnderscoreExpressionNode*>(node.get());
      if (state.production_index == 0) {
        ue_node->value = "_";
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::GROUPED_EXPRESSION)) {
      auto ge_node = static_cast<GroupedExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
        ge_node->expression = std::move(node->children[1]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::ARRAY_EXPRESSION)) {
      auto ae_node = static_cast<ArrayExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
        ae_node->optional_array_elements = std::move(node->children[1]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_ARRAY_ELEMENTS)) {
      auto oae_node = static_cast<OptionalArrayElementsNode*>(node.get());
      if (state.production_index == 0) {
        oae_node->array_elements = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::ARRAY_ELEMENTS)) {
      auto ae_node = static_cast<ArrayElementsNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 4) {
@@ -1187,7 +1126,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        ae_node->expression = std::move(node->children[0]);
        ae_node->size_expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::COMMA_ARRAY_ELEMENTS)) {
      auto cae_node = static_cast<CommaArrayElementsNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
@@ -1195,20 +1133,17 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        cae_node->expressions = std::move(prev_cae->expressions);
        cae_node->expressions.push_back(std::move(node->children[2]));
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::STRUCT_EXPRESSION)) {
      auto se_node = static_cast<StructExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 4) {
        se_node->path_in_expression = std::move(node->children[0]);
        se_node->optional_struct_expr_fields = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::OPTIONAL_STRUCT_EXPR_FIELDS)) {
      auto osef_node = static_cast<OptionalStructExprFieldsNode*>(node.get());
      if (state.production_index == 0) {
        osef_node->struct_expr_fields = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::STRUCT_EXPR_FIELDS)) {
      auto sef_node = static_cast<StructExprFieldsNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
@@ -1217,7 +1152,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        sef_node->struct_expr_fields.insert(sef_node->struct_expr_fields.end(), std::make_move_iterator(csef->struct_expr_fields.begin()), std::make_move_iterator(csef->struct_expr_fields.end()));
        sef_node->optional_comma = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::COMMA_STRUCT_EXPR_FIELDS)) {
      auto csef_node = static_cast<CommaStructExprFieldsNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
@@ -1225,14 +1159,12 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        csef_node->struct_expr_fields = std::move(prev_csef->struct_expr_fields);
        csef_node->struct_expr_fields.push_back(std::move(node->children[2]));
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::STRUCT_EXPR_FIELD)) {
      auto sef_node = static_cast<StructExprFieldNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
        sef_node->identifier = static_cast<IdentifierNode*>(node->children[0].get())->value;
        sef_node->expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::METHOD_CALL_EXPRESSION)) {
      auto mce_node = static_cast<MethodCallExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 5) {
@@ -1240,21 +1172,18 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        mce_node->path_expr_segment = std::move(node->children[2]);
        mce_node->optional_call_params = std::move(node->children[4]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::FIELD_EXPRESSION)) {
      auto fe_node = static_cast<FieldExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
        fe_node->postfix_expression = std::move(node->children[0]);
        fe_node->identifier = static_cast<IdentifierNode*>(node->children[2].get())->value;
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::INDEX_EXPRESSION)) {
      auto ie_node = static_cast<IndexExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 4) {
        ie_node->postfix_expression = std::move(node->children[0]);
        ie_node->expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::BORROW_EXPRESSION)) {
      auto be_node = static_cast<BorrowExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
@@ -1272,13 +1201,11 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        be_node->ampersand = "&&";
        be_node->unary_operator_expression = std::move(node->children[1]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::DEREFERENCE_EXPRESSION)) {
      auto de_node = static_cast<DereferenceExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 2) {
        de_node->unary_operator_expression = std::move(node->children[1]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::EXPRESSION_WITH_BLOCK)) {
      auto ewb_node = static_cast<ExpressionWithBlockNode*>(node.get());
      if (state.production_index == 0) {
@@ -1288,25 +1215,21 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else {
        ewb_node->if_expression = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::CONTINUE_EXPRESSION)) {
      auto ce_node = static_cast<ContinueExpressionNode*>(node.get());
      if (state.production_index == 0) {
        ce_node->value = "continue";
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::BREAK_EXPRESSION)) {
      auto be_node = static_cast<BreakExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 2) {
        be_node->flow_control_expression = std::move(node->children[1]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::RETURN_EXPRESSION)) {
      auto re_node = static_cast<ReturnExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 2) {
        re_node->flow_control_expression = std::move(node->children[1]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::LOOP_EXPRESSION)) {
      auto le_node = static_cast<LoopExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -1314,20 +1237,17 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else {
        le_node->predicate_loop_expression = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::INFINITE_LOOP_EXPRESSION)) {
      auto ile_node = static_cast<InfiniteLoopExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 2) {
        ile_node->block_expression = std::move(node->children[1]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::PREDICATE_LOOP_EXPRESSION)) {
      auto ple_node = static_cast<PredicateLoopExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
        ple_node->conditions = std::move(node->children[1]);
        ple_node->block_expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::IF_EXPRESSION)) {
      auto ie_node = static_cast<IfExpressionNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 5) {
@@ -1342,13 +1262,11 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        ie_node->conditions = std::move(node->children[1]);
        ie_node->block_expression = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::CONDITIONS)) {
      auto c_node = static_cast<ConditionsNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
        c_node->expression = std::move(node->children[1]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::PATTERN)) {
      auto p_node = static_cast<PatternNode*>(node.get());
      if (state.production_index == 0) {
@@ -1358,7 +1276,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else {
        p_node->reference_pattern = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::IDENTIFIER_PATTERN)) {
      auto ip_node = static_cast<IdentifierPatternNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 4) {
@@ -1374,13 +1291,11 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else if (state.production_index == 3 && node->children.size() >= 1) {
        ip_node->identifier = static_cast<IdentifierNode*>(node->children[0].get())->value;
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::WILDCARD_PATTERN)) {
      auto wp_node = static_cast<WildcardPatternNode*>(node.get());
      if (state.production_index == 0) {
        wp_node->value = "_";
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::REFERENCE_PATTERN)) {
      auto rp_node = static_cast<ReferencePatternNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 3) {
@@ -1398,7 +1313,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        rp_node->ampersand = "&&";
        rp_node->pattern = std::move(node->children[1]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::TYPE)) {
      auto t_node = static_cast<TypeNode*>(node.get());
      if (state.production_index == 0) {
@@ -1410,13 +1324,11 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else {
        t_node->unit_type = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::TYPE_PATH)) {
      auto tp_node = static_cast<TypePathNode*>(node.get());
      if (state.production_index == 0) {
        tp_node->path_expr_segment = std::move(node->children[0]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::REFERENCE_TYPE)) {
      auto rt_node = static_cast<ReferenceTypeNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 2) {
@@ -1425,14 +1337,12 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else if (state.production_index == 1 && node->children.size() >= 2) {
        rt_node->type = std::move(node->children[1]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::ARRAY_TYPE)) {
      auto at_node = static_cast<ArrayTypeNode*>(node.get());
      if (state.production_index == 0 && node->children.size() >= 5) {
        at_node->type = std::move(node->children[1]);
        at_node->expression = std::move(node->children[3]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::PATH_IN_EXPRESSION)) {
      auto pie_node = static_cast<PathInExpressionNode*>(node.get());
      if (state.production_index == 0) {
@@ -1441,7 +1351,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
        pie_node->path_expr_segment = std::move(node->children[0]);
        pie_node->path_expr_segment2 = std::move(node->children[2]);
      }
-     node->children.clear();
    } else if (state.nonterminal_type == static_cast<int>(Nonterminal::PATH_EXPR_SEGMENT)) {
      auto pes_node = static_cast<PathExprSegmentNode*>(node.get());
      if (state.production_index == 0) {
@@ -1451,7 +1360,6 @@ std::unique_ptr<TreeNode> construct_cst(const ParsingState& state, std::size_t i
      } else if (state.production_index == 2) {
        pes_node->self_keyword = "self";
      }
-     node->children.clear();
    }
 
    return node;
