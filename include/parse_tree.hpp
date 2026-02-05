@@ -248,9 +248,8 @@ private:
   void print_node_start(const std::string& node_type);
   void print_node_with_value(const std::string& node_type, const std::string& value);
   void print_node_end();
-  std::any visit_child(TreeNode* child);
+  std::any visit_child(const std::unique_ptr<TreeNode>& child);
   void visit_children(const std::vector<std::unique_ptr<TreeNode>>& children);
-  void visit_children(const std::vector<TreeNode*>& children);
 
 public:
   DebugTreeVisitor(std::ostream& o = std::cout) : indent_level(0), out(o) {}
@@ -413,63 +412,64 @@ public:
   std::string value;
 };
 
+// Note: For nonterminals, child node pointers are used instead of std::vector/std::string
+// The children vector is populated from the production rule components
 class ItemsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> items;
 };
 
 class ItemNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  TreeNode* item;
+  std::unique_ptr<TreeNode> item;
 };
 
 class FunctionNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  TreeNode* optional_const;
-  std::string identifier;
-  TreeNode* optional_function_parameters;
-  TreeNode* optional_function_return_type;
-  TreeNode* block_expression_or_semicolon;
+  std::unique_ptr<TreeNode> optional_const;
+  std::unique_ptr<IdentifierNode> identifier;
+  std::unique_ptr<TreeNode> optional_function_parameters;
+  std::unique_ptr<TreeNode> optional_function_return_type;
+  std::unique_ptr<TreeNode> block_expression_or_semicolon;
 };
 
 class OptionalConstNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string value; // "const" or empty
+  std::unique_ptr<KeywordNode> keyword; // "const" or nullptr
 };
 
 class FunctionParametersNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  TreeNode* self_param;
-  TreeNode* optional_comma;
-  std::vector<TreeNode*> function_params;
-  TreeNode* comma_function_params;
+  std::unique_ptr<TreeNode> self_param; // for Rule 0 and Rule 2
+  std::unique_ptr<TreeNode> function_param; // for Rule 1
+  std::unique_ptr<TreeNode> comma_function_params; // for Rule 1 and Rule 2
+  std::unique_ptr<TreeNode> optional_comma; // for Rule 0, Rule 1, Rule 2
 };
 
 class SelfParamNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  TreeNode* shorthand_self;
-  TreeNode* typed_self;
+  std::unique_ptr<TreeNode> shorthand_self;
+  std::unique_ptr<TreeNode> typed_self;
 };
 
 class ShorthandSelfNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string ampersand; // "&" or empty
-  std::string mut; // "mut" or empty
-  std::string self; // "self"
+  std::unique_ptr<KeywordNode> ampersand; // "&" or nullptr
+  std::unique_ptr<KeywordNode> mut; // "mut" or nullptr
+  std::unique_ptr<KeywordNode> self; // "self" (always present)
 };
 
 class TypedSelfNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string mut; // "mut" or empty
-  std::string self; // "self"
+  std::unique_ptr<KeywordNode> mut; // "mut" or nullptr
+  std::unique_ptr<KeywordNode> self; // "self" (always present)
   std::unique_ptr<TreeNode> type;
 };
 
@@ -495,13 +495,15 @@ public:
 class OptionalCommaNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string value; // "," or empty
+  std::unique_ptr<PunctuationNode> comma; // "," or nullptr
 };
 
 class CommaFunctionParamsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<TreeNode*> function_params;
+  std::unique_ptr<TreeNode> comma_function_params; // recursive
+  std::unique_ptr<PunctuationNode> comma; // "," or nullptr
+  std::unique_ptr<TreeNode> function_param; // for non-empty case
 };
 
 class OptionalFunctionReturnTypeNode : public TreeNode {
@@ -514,28 +516,29 @@ class BlockExpressionOrSemicolonNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
   std::unique_ptr<TreeNode> block_expression;
-  std::string semicolon; // ";" or empty
+  std::unique_ptr<PunctuationNode> semicolon; // ";" or nullptr
 };
 
 class StructNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string identifier;
+  std::unique_ptr<IdentifierNode> identifier;
   std::unique_ptr<TreeNode> optional_struct_fields;
-  std::string semicolon; // ";" or empty
+  std::unique_ptr<PunctuationNode> semicolon; // ";" or nullptr (for Rule 15)
 };
 
 class StructFieldsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> struct_fields;
-  std::unique_ptr<TreeNode> optional_comma;
+  std::unique_ptr<TreeNode> struct_field; // first struct field
+  std::unique_ptr<TreeNode> comma_struct_fields; // COMMA_STRUCT_FIELDS nonterminal
+  std::unique_ptr<PunctuationNode> optional_comma; // optional comma at end
 };
 
 class StructFieldNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string identifier;
+  std::unique_ptr<IdentifierNode> identifier;
   std::unique_ptr<TreeNode> type;
 };
 
@@ -548,27 +551,30 @@ public:
 class CommaStructFieldsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> struct_fields;
+  std::unique_ptr<TreeNode> comma_struct_fields; // recursive
+  std::unique_ptr<PunctuationNode> comma; // "," or nullptr
+  std::unique_ptr<TreeNode> struct_field; // for non-empty case
 };
 
 class EnumerationNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string identifier;
+  std::unique_ptr<IdentifierNode> identifier;
   std::unique_ptr<TreeNode> optional_enum_variants;
 };
 
 class EnumVariantsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> enum_variants;
-  std::unique_ptr<TreeNode> optional_comma;
+  std::unique_ptr<TreeNode> enum_variant; // first enum variant
+  std::unique_ptr<TreeNode> comma_enum_variants; // COMMA_ENUM_VARIANTS nonterminal
+  std::unique_ptr<PunctuationNode> optional_comma; // optional comma at end
 };
 
 class EnumVariantNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string identifier;
+  std::unique_ptr<IdentifierNode> identifier;
 };
 
 class OptionalEnumVariantsNode : public TreeNode {
@@ -580,13 +586,15 @@ public:
 class CommaEnumVariantsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> enum_variants;
+  std::unique_ptr<TreeNode> comma_enum_variants; // recursive
+  std::unique_ptr<PunctuationNode> comma; // "," or nullptr
+  std::unique_ptr<TreeNode> enum_variant; // for non-empty case
 };
 
 class ConstantItemNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string identifier;
+  std::unique_ptr<IdentifierNode> identifier;
   std::unique_ptr<TreeNode> type;
   std::unique_ptr<TreeNode> expression; // optional
 };
@@ -594,7 +602,7 @@ public:
 class TraitNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string identifier;
+  std::unique_ptr<IdentifierNode> identifier;
   std::unique_ptr<TreeNode> items;
 };
 
@@ -615,7 +623,7 @@ public:
 class TraitImplNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string identifier;
+  std::unique_ptr<IdentifierNode> identifier;
   std::unique_ptr<TreeNode> type;
   std::unique_ptr<TreeNode> items;
 };
@@ -623,10 +631,10 @@ public:
 class StatementNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string semicolon; // ";" or empty
-  std::unique_ptr<TreeNode> item;
-  std::unique_ptr<TreeNode> let_statement;
-  std::unique_ptr<TreeNode> expression_statement;
+  std::unique_ptr<PunctuationNode> semicolon; // ";" or nullptr (for Rule 30.1)
+  std::unique_ptr<TreeNode> item; // for Rule 30.2
+  std::unique_ptr<TreeNode> let_statement; // for Rule 30.3
+  std::unique_ptr<TreeNode> expression_statement; // for Rule 30.4
 };
 
 class LetStatementNode : public TreeNode {
@@ -673,8 +681,8 @@ public:
   std::unique_ptr<TreeNode> char_literal;
   std::unique_ptr<TreeNode> string_literal;
   std::unique_ptr<TreeNode> integer_literal;
-  std::string true_keyword; // "true" or empty
-  std::string false_keyword; // "false" or empty
+  std::unique_ptr<KeywordNode> true_keyword; // "true" or nullptr
+  std::unique_ptr<KeywordNode> false_keyword; // "false" or nullptr
 };
 
 class UnderscoreExpressionNode : public TreeNode {
@@ -704,16 +712,18 @@ public:
 class ArrayElementsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> expressions;
-  std::unique_ptr<TreeNode> optional_comma;
-  std::unique_ptr<TreeNode> expression; // for [expr; expr]
-  std::unique_ptr<TreeNode> size_expression;
+  std::unique_ptr<TreeNode> expression; // first expression
+  std::unique_ptr<TreeNode> comma_array_elements; // COMMA_ARRAY_ELEMENTS nonterminal
+  std::unique_ptr<PunctuationNode> optional_comma; // optional comma
+  std::unique_ptr<TreeNode> size_expression; // for [expr; expr] case (Rule 41.2)
 };
 
 class CommaArrayElementsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> expressions;
+  std::unique_ptr<TreeNode> comma_array_elements; // recursive
+  std::unique_ptr<PunctuationNode> comma; // "," or nullptr
+  std::unique_ptr<TreeNode> expression; // for non-empty case
 };
 
 class PathExpressionNode : public TreeNode {
@@ -738,20 +748,23 @@ public:
 class StructExprFieldsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> struct_expr_fields;
-  std::unique_ptr<TreeNode> optional_comma;
+  std::unique_ptr<TreeNode> struct_expr_field; // first field
+  std::unique_ptr<TreeNode> comma_struct_expr_fields; // COMMA_STRUCT_EXPR_FIELDS nonterminal
+  std::unique_ptr<PunctuationNode> optional_comma; // optional comma at end
 };
 
 class CommaStructExprFieldsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> struct_expr_fields;
+  std::unique_ptr<TreeNode> comma_struct_expr_fields; // recursive
+  std::unique_ptr<PunctuationNode> comma; // "," or nullptr
+  std::unique_ptr<TreeNode> struct_expr_field; // for non-empty case
 };
 
 class StructExprFieldNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string identifier;
+  std::unique_ptr<IdentifierNode> identifier;
   std::unique_ptr<TreeNode> expression;
 };
 
@@ -782,21 +795,24 @@ public:
 class CallParamsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> expressions;
-  std::unique_ptr<TreeNode> optional_comma;
+  std::unique_ptr<TreeNode> expression; // first expression
+  std::unique_ptr<TreeNode> comma_call_params; // COMMA_CALL_PARAMS nonterminal
+  std::unique_ptr<PunctuationNode> optional_comma; // optional comma
 };
 
 class CommaCallParamsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<std::unique_ptr<TreeNode>> expressions;
+  std::unique_ptr<TreeNode> comma_call_params; // recursive
+  std::unique_ptr<PunctuationNode> comma; // "," or nullptr
+  std::unique_ptr<TreeNode> expression; // for non-empty case
 };
 
 class FieldExpressionNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
   std::unique_ptr<TreeNode> postfix_expression;
-  std::string identifier;
+  std::unique_ptr<IdentifierNode> identifier; // the identifier after the dot
 };
 
 class CallExpressionNode : public TreeNode {
@@ -825,8 +841,8 @@ public:
 class BorrowExpressionNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string ampersand; // "&" or "&&"
-  std::string mut; // "mut" or empty
+  std::unique_ptr<PunctuationNode> ampersand; // "&" or "&&"
+  std::unique_ptr<KeywordNode> mut; // "mut" or nullptr
   std::unique_ptr<TreeNode> unary_operator_expression;
 };
 
@@ -839,7 +855,7 @@ public:
 class NegationExpressionNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string operator_; // "!" or "-"
+  std::unique_ptr<PunctuationNode> operator_; // "!" or "-"
   std::unique_ptr<TreeNode> unary_operator_expression;
 };
 
@@ -855,7 +871,7 @@ class MultiplicativeOperatorExpressionNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
   std::unique_ptr<TreeNode> type_cast_expression;
-  std::string operator_; // "*" or "/" or "%"
+  std::unique_ptr<PunctuationNode> operator_; // "*" or "/" or "%"
   std::unique_ptr<TreeNode> multiplicative_operator_expression;
 };
 
@@ -863,7 +879,7 @@ class AdditiveOperatorExpressionNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
   std::unique_ptr<TreeNode> multiplicative_operator_expression;
-  std::string operator_; // "+" or "-"
+  std::unique_ptr<PunctuationNode> operator_; // "+" or "-"
   std::unique_ptr<TreeNode> additive_operator_expression;
 };
 
@@ -871,7 +887,7 @@ class ShiftOperatorExpressionNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
   std::unique_ptr<TreeNode> additive_operator_expression;
-  std::string operator_; // "<<" or ">>"
+  std::unique_ptr<PunctuationNode> operator_; // "<<" or ">>"
   std::unique_ptr<TreeNode> shift_operator_expression;
 };
 
@@ -900,7 +916,7 @@ class ComparisonOperatorExpressionNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
   std::unique_ptr<TreeNode> or_expression;
-  std::string operator_; // "==" or "!=" or "<" or "<=" or ">" or ">="
+  std::unique_ptr<PunctuationNode> operator_; // "==" or "!=" or "<" or "<=" or ">" or ">="
   std::unique_ptr<TreeNode> or_expression_right;
 };
 
@@ -937,7 +953,7 @@ class CompoundAssignmentExpressionNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
   std::unique_ptr<TreeNode> lazy_or_expression;
-  std::string operator_; // "+=" etc.
+  std::unique_ptr<PunctuationNode> operator_; // "+=" etc.
   std::unique_ptr<TreeNode> assignment_expression;
 };
 
@@ -979,14 +995,15 @@ public:
 class BlockExpressionNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  TreeNode* statements;
-  TreeNode* expression; // optional
+  std::unique_ptr<TreeNode> statements;
+  std::unique_ptr<TreeNode> expression; // optional
 };
 
 class StatementsNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::vector<TreeNode*> statements;
+  std::unique_ptr<TreeNode> statements; // recursive STATEMENTS
+  std::unique_ptr<TreeNode> statement; // STATEMENT
 };
 
 class LoopExpressionNode : public TreeNode {
@@ -1035,9 +1052,9 @@ public:
 class IdentifierPatternNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string ref; // "ref" or empty
-  std::string mut; // "mut" or empty
-  std::string identifier;
+  std::unique_ptr<KeywordNode> ref; // "ref" or nullptr
+  std::unique_ptr<KeywordNode> mut; // "mut" or nullptr
+  std::unique_ptr<IdentifierNode> identifier;
 };
 
 class WildcardPatternNode : public TreeNode {
@@ -1049,8 +1066,8 @@ public:
 class ReferencePatternNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string ampersand; // "&" or "&&"
-  std::string mut; // "mut" or empty
+  std::unique_ptr<PunctuationNode> ampersand; // "&" or "&&"
+  std::unique_ptr<KeywordNode> mut; // "mut" or nullptr
   std::unique_ptr<TreeNode> pattern;
 };
 
@@ -1072,7 +1089,8 @@ public:
 class ReferenceTypeNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string mut; // "mut" or empty
+  std::unique_ptr<PunctuationNode> ampersand; // "&" (always present)
+  std::unique_ptr<KeywordNode> mut; // "mut" or nullptr
   std::unique_ptr<TreeNode> type;
 };
 
@@ -1098,8 +1116,8 @@ public:
 class PathExprSegmentNode : public TreeNode {
 public:
   std::any accept(TreeVisitor& visitor) override { return visitor.visit(*this); }
-  std::string identifier;
-  std::string self_keyword; // "Self" or "self" or empty
+  std::unique_ptr<IdentifierNode> identifier; // for Identifier case
+  std::unique_ptr<KeywordNode> self_keyword; // "Self" or "self" or nullptr
 };
 
 #endif
