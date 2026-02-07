@@ -897,3 +897,427 @@ std::any DebugTreeVisitor::visit(PathExprSegmentNode& node) {
   print_node_end();
   return std::any();
 }
+
+// accept() method implementations for all TreeNode derived classes
+
+// Terminals
+std::any IdentifierNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any KeywordNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any CharLiteralNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any StringLiteralNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any IntegerLiteralNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any PunctuationNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any WhitespaceNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any CommentNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+// Nonterminals
+std::any ItemsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ItemNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any FunctionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any OptionalConstNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any FunctionParametersNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any SelfParamNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ShorthandSelfNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any TypedSelfNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any FunctionParamNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any FunctionReturnTypeNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any OptionalFunctionParametersNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any OptionalCommaNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any CommaFunctionParamsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any OptionalFunctionReturnTypeNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any BlockExpressionOrSemicolonNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any StructNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any StructFieldsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any StructFieldNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any OptionalStructFieldsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any CommaStructFieldsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any EnumerationNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any EnumVariantsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any EnumVariantNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any OptionalEnumVariantsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any CommaEnumVariantsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ConstantItemNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any TraitNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ImplementationNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any InherentImplNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any TraitImplNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any StatementNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any LetStatementNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ExpressionStatementNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any Unused1Node::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any BasicExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any LiteralExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any UnderscoreExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any GroupedExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ArrayExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any OptionalArrayElementsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ArrayElementsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any CommaArrayElementsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any PathExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any StructExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any OptionalStructExprFieldsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any StructExprFieldsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any CommaStructExprFieldsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any StructExprFieldNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any PostfixExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any MethodCallExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any OptionalCallParamsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any CallParamsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any CommaCallParamsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any FieldExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any CallExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any IndexExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any UnaryOperatorExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any BorrowExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any DereferenceExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any NegationExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any TypeCastExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any MultiplicativeOperatorExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any AdditiveOperatorExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ShiftOperatorExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any AndExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any XorExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any OrExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ComparisonOperatorExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any LazyAndExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any LazyOrExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any AssignmentExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any SimpleAssignmentExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any CompoundAssignmentExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any FlowControlExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ContinueExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any BreakExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ReturnExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ExpressionWithBlockNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any BlockExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any StatementsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any LoopExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any InfiniteLoopExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any PredicateLoopExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any IfExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ConditionsNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any PatternNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any IdentifierPatternNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any WildcardPatternNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ReferencePatternNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any TypeNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any TypePathNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ReferenceTypeNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any ArrayTypeNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any UnitTypeNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any PathInExpressionNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
+
+std::any PathExprSegmentNode::accept(TreeVisitor& visitor) {
+  return visitor.visit(*this);
+}
