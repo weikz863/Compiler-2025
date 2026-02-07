@@ -19,28 +19,29 @@ The `Parse` method is used to generate the parse tree (CST). It reads the parsin
 
 The `Parse` method detailed implementation algorithm pseudocode:
 
-```cpp
+```plaintext
 // pseudocode that ensures a rightmost derivation and correct rule precedence
 // adapted from *A Second Course in Formal Languanges and Automata Theory*
-// PARSE(A -> β•, i, j) 
-// /* Finds a rightmost derivation of w[i+1 ... j] starting with production A -> β• */
-//     If β = X1 X2 ... Xm, set k := m and l := j
-//     Repeat until k = 0:
-//         If Xk is terminal:
-//             set k := k - 1 and l := l - 1
-//             save node(Xk) as subtree(Xk)
-//         Else Xk is nonterminal:
-//             for each production Xk -> γ•, tried in order:
-//                 find maximum possible r such that Xk -> γ• in [r, l]
-//                   and A -> X1 X2 ... Xk-1 • Xk ... Xm in [i, r] if exists
-//                 if found, break
-//             Call PARSE(Xk -> γ•, r, l)
-//             save the returned subtree as subtree(Xk)
-//         Set k := k - 1 and l := r
-//     r = new node of type A
-//     for i = 1 ... m:
-//         set appropriate child of r to subtree(Xi)
-//     return r
+
+// Find a rightmost derivation of w[i+1 ... j] starting with production A -> β•
+PARSE(A -> β•, i, j) 
+    If β = X1 X2 ... Xm, set k := m and l := j
+    Repeat until k = 0:
+        If Xk is terminal:
+            set k := k - 1 and l := l - 1
+            save node(Xk) as subtree(Xk)
+        Else Xk is nonterminal:
+            for each production Xk -> γ•, tried in order:
+                find maximum possible r such that Xk -> γ• in [r, l]
+                  and A -> X1 X2 ... Xk-1 • Xk ... Xm in [i, r] if exists
+                if found, break
+            Call PARSE(Xk -> γ•, r, l)
+            save the returned subtree as subtree(Xk)
+        Set k := k - 1 and l := r
+    r = new node of type A
+    for i = 1 ... m:
+        set appropriate child of r to subtree(Xi)
+    return r
 ```
 
 The CST created by the `Parse` method is a tree that represents the input string. It contains all the information about the input string, including every terminal and nonterminal symbol in the input string, as well as the production rules used to derive each nonterminal symbol. Every nonterminal should have a child for every symbol in its production rule.
