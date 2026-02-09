@@ -4,6 +4,7 @@
 #include <fstream>
 #include "lexer.hpp"
 #include "parser.hpp"
+#include "parse_tree.hpp"
 
 int main(int argc, char* argv[]) {
   std::string content {
@@ -15,7 +16,7 @@ int main(int argc, char* argv[]) {
 
   try {
     EarleyParser parser(std::move(tokens));
-    if (parser.accepts()) {
+    if (parser.parse()) {
       std::cout << "Parsing successful!" << std::endl;
     } else {
       std::cout << "Parsing failed!" << std::endl;

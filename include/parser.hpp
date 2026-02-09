@@ -26,6 +26,8 @@ class ParseError : public std::runtime_error {
   explicit ParseError(const std::string &message) : std::runtime_error(message) {}
 };
 
+class TreeNode;
+
 class EarleyParser {
  public:
   EarleyParser(std::vector<Token> &&);
@@ -35,6 +37,7 @@ class EarleyParser {
   EarleyParser& operator=(EarleyParser &&) = delete;
   ~EarleyParser() = default;
   bool accepts() const;
+  std::unique_ptr<TreeNode> parse() const;
 
  private:
   const std::vector<Token> tokens;
@@ -49,6 +52,8 @@ class EarleyParser {
   void predictor(const ParsingState& state, std::size_t chart_index);
   void scanner(const ParsingState& state, std::size_t chart_index);
   void completer(const ParsingState& state, std::size_t chart_index);
+  
+  friend class TreeNode;
 };
 
 #endif

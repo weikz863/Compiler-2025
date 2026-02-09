@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include "parse_tree.hpp"
 #include <iostream>
 #include <algorithm>
 #include <optional>
@@ -80,18 +81,18 @@ bool EarleyParser::is_terminal(const Symbol& symbol) const {
 }
 
 void EarleyParser::add_to_set(ParsingState state, std::size_t chart_index) {
-  std::cerr << "DEBUG: add_to_set called - Chart:" << chart_index
-            << " NT:" << state.nonterminal_type
-            << " Prod:" << state.production_index
-            << " Pos:" << state.position_in_production
-            << " Start:" << state.start_token_index << std::endl;
+  // std::cerr << "DEBUG: add_to_set called - Chart:" << chart_index
+  //           << " NT:" << state.nonterminal_type
+  //           << " Prod:" << state.production_index
+  //           << " Pos:" << state.position_in_production
+  //           << " Start:" << state.start_token_index << std::endl;
 
   auto& chart_set = table[chart_index];
   if (std::find(chart_set.begin(), chart_set.end(), state) == chart_set.end()) {
-    std::cerr << "DEBUG: Adding new state to chart " << chart_index << std::endl;
+    // std::cerr << "DEBUG: Adding new state to chart " << chart_index << std::endl;
     chart_set.push_back(state);
   } else {
-    std::cerr << "DEBUG: State already exists in chart " << chart_index << std::endl;
+    // std::cerr << "DEBUG: State already exists in chart " << chart_index << std::endl;
   }
 }
 
@@ -119,18 +120,18 @@ void EarleyParser::scanner(const ParsingState& state, std::size_t chart_index) {
     auto next = next_element(state);
     const Token& expected_token = std::get<Token>(next);
     const Token& current_token = tokens[chart_index];
-    std::cerr << "DEBUG: Scanner - Expected token: type=" << static_cast<int>(expected_token.type)
-              << " value='" << expected_token.value << "' Current token: type=" << static_cast<int>(current_token.type)
-              << " value='" << current_token.value << "'" << std::endl;
+    // std::cerr << "DEBUG: Scanner - Expected token: type=" << static_cast<int>(expected_token.type)
+    //           << " value='" << expected_token.value << "' Current token: type=" << static_cast<int>(current_token.type)
+    //           << " value='" << current_token.value << "'" << std::endl;
 
     // Check if the current token matches using Token::match method
     if (expected_token.match(current_token)) {
-      std::cerr << "DEBUG: Scanner - Match found!" << std::endl;
+      // std::cerr << "DEBUG: Scanner - Match found!" << std::endl;
       ParsingState new_state = state;
       new_state.position_in_production++;
       add_to_set(new_state, chart_index + 1);
     } else {
-      std::cerr << "DEBUG: Scanner - No match" << std::endl;
+      // std::cerr << "DEBUG: Scanner - No match" << std::endl;
     }
   }
 }
@@ -170,34 +171,34 @@ EarleyParser::EarleyParser(std::vector<Token>&& input) : tokens{input}, table{to
   // Main parsing loop - Earley parser algorithm
   for (std::size_t k = 0; k <= tokens.size(); ++k) {
 
-    std::cerr << "DEBUG: Processing chart " << k << " with " << table[k].size() << " states" << std::endl;
+    // std::cerr << "DEBUG: Processing chart " << k << " with " << table[k].size() << " states" << std::endl;
 
     // Process all states in S[k] - states can expand during this loop
     for (std::size_t state_index = 0; state_index < table[k].size(); state_index++) {
       const ParsingState state = *std::next(table[k].begin(), state_index);
 
-        std::cerr << "DEBUG: Processing state - NT:" << state.nonterminal_type
-                  << " Prod:" << state.production_index
-                  << " Pos:" << state.position_in_production
-                  << " Start:" << state.start_token_index << std::endl;
+        // std::cerr << "DEBUG: Processing state - NT:" << state.nonterminal_type
+        //           << " Prod:" << state.production_index
+        //           << " Pos:" << state.position_in_production
+        //           << " Start:" << state.start_token_index << std::endl;
 
       if (is_finished(state)) {
-        std::cerr << "DEBUG: State is finished, calling completer" << std::endl;
+        // std::cerr << "DEBUG: State is finished, calling completer" << std::endl;
         completer(state, k);
       } else if (k < tokens.size()) {
         auto next = next_element(state);
         if (is_nonterminal(next)) {
-          std::cerr << "DEBUG: Next element is nonterminal, calling predictor" << std::endl;
+          // std::cerr << "DEBUG: Next element is nonterminal, calling predictor" << std::endl;
           predictor(state, k);
         } else if (is_terminal(next)) {
-          std::cerr << "DEBUG: Next element is terminal, calling scanner" << std::endl;
+          // std::cerr << "DEBUG: Next element is terminal, calling scanner" << std::endl;
           scanner(state, k);
         }
       }
     }
-    std::cerr << "DEBUG: Finished processing chart " << k << ", final size: " << table[k].size() << " states" << std::endl;
+    // std::cerr << "DEBUG: Finished processing chart " << k << ", final size: " << table[k].size() << " states" << std::endl;
   }
-  std::cerr << "DEBUG: Parser constructor completed" << std::endl;
+  // std::cerr << "DEBUG: Parser constructor completed" << std::endl;
 }
 
 bool EarleyParser::accepts() const {
@@ -213,4 +214,19 @@ bool EarleyParser::accepts() const {
     }
   }
   return false;
+}
+
+std::unique_ptr<TreeNode> EarleyParser::parse() const {
+  if (table.empty()) return {};
+  const auto& final_chart = table.back();
+  for (std::size_t i = 0; i < final_chart.size(); i++) {
+    const auto &state = final_chart[i];
+    // Look for a state that represents a completed ITEMS production
+    if (state.nonterminal_type == static_cast<int>(Nonterminal::ITEMS) &&
+        state.start_token_index == 0 && state.production_index == 0 &&
+        is_finished(state)) {
+      return std::make_unique<TreeNode>(*this, table.size() - 1, i);
+    }
+  }
+  return {};
 }

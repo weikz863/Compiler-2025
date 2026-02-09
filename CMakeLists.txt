@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(ENABLE_LEXER_TEST "enable lexer test" OFF)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_library(project_library src/lexer.cpp src/parse_rules.cpp src/parser.cpp)
+add_library(project_library src/lexer.cpp src/parse_rules.cpp src/parser.cpp src/parse_tree.cpp)
 
 add_executable(
   main
