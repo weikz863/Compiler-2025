@@ -70,3 +70,18 @@ void TreeNode::accept(VisitorBase &visitor) {
   }
   visitor.visit(*this);
 }
+
+void PrintVisitor::visit(TreeNode &node) {
+  switch(node.data.index()) {
+    case 0: { // ParsingState
+      break;
+    }
+    case 1: { // std::string
+      std::cout << std::get<1>(node.data) << ' ';
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+}

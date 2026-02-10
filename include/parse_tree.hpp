@@ -23,4 +23,9 @@ class TreeNode {
   std::vector<std::unique_ptr<TreeNode>> children;
 };
 
+class PrintVisitor: public VisitorBase {
+ public: 
+  void visit(TreeNode &) override;
+};
+
 #endif

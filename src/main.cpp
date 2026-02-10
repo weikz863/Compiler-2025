@@ -16,8 +16,11 @@ int main(int argc, char* argv[]) {
 
   try {
     EarleyParser parser(std::move(tokens));
-    if (parser.parse()) {
+    if (auto root = parser.parse(); root != nullptr) {
       std::cout << "Parsing successful!" << std::endl;
+      PrintVisitor print_visitor;
+      root->accept(print_visitor);
+      std::cout << std::endl;
     } else {
       std::cout << "Parsing failed!" << std::endl;
       return 1;
