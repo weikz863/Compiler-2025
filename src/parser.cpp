@@ -116,7 +116,7 @@ void EarleyParser::predictor(const ParsingState& state, std::size_t chart_index)
 }
 
 void EarleyParser::scanner(const ParsingState& state, std::size_t chart_index) {
-  if (true) { // todo
+  if (true) {
     auto next = next_element(state);
     const Token& expected_token = std::get<Token>(next);
     const Token& current_token = tokens[chart_index];
@@ -137,7 +137,7 @@ void EarleyParser::scanner(const ParsingState& state, std::size_t chart_index) {
 }
 
 void EarleyParser::completer(const ParsingState& state, std::size_t chart_index) {
-  if (is_finished(state)) {
+  if (true) {
     // Find all states in S[state.start_token_index] that were waiting for this nonterminal
     if (state.start_token_index < table.size()) {
       const auto& start_chart = table[state.start_token_index];
@@ -154,6 +154,8 @@ void EarleyParser::completer(const ParsingState& state, std::size_t chart_index)
           }
         }
       }
+    } else {
+      throw ParseError("Completer - state.start_token_index >= table.size()");
     }
   }
 }
@@ -217,6 +219,12 @@ bool EarleyParser::accepts() const {
 }
 
 std::unique_ptr<TreeNode> EarleyParser::parse() const {
+  // for (const auto &end: table) {
+  //   for (const auto &state: end) {
+  //     std::cerr << state.nonterminal_type << ' ' << state.production_index << '\n';
+  //   }
+  // }
+
   if (table.empty()) return {};
   const auto& final_chart = table.back();
   for (std::size_t i = 0; i < final_chart.size(); i++) {
