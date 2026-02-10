@@ -116,47 +116,42 @@ void EarleyParser::predictor(const ParsingState& state, std::size_t chart_index)
 }
 
 void EarleyParser::scanner(const ParsingState& state, std::size_t chart_index) {
-  if (true) {
-    auto next = next_element(state);
-    const Token& expected_token = std::get<Token>(next);
-    const Token& current_token = tokens[chart_index];
-    // std::cerr << "DEBUG: Scanner - Expected token: type=" << static_cast<int>(expected_token.type)
-    //           << " value='" << expected_token.value << "' Current token: type=" << static_cast<int>(current_token.type)
-    //           << " value='" << current_token.value << "'" << std::endl;
-
-    // Check if the current token matches using Token::match method
-    if (expected_token.match(current_token)) {
-      // std::cerr << "DEBUG: Scanner - Match found!" << std::endl;
-      ParsingState new_state = state;
-      new_state.position_in_production++;
-      add_to_set(new_state, chart_index + 1);
-    } else {
-      // std::cerr << "DEBUG: Scanner - No match" << std::endl;
-    }
+  auto next = next_element(state);
+  const Token& expected_token = std::get<Token>(next);
+  const Token& current_token = tokens[chart_index];
+  // std::cerr << "DEBUG: Scanner - Expected token: type=" << static_cast<int>(expected_token.type)
+  //           << " value='" << expected_token.value << "' Current token: type=" << static_cast<int>(current_token.type)
+  //           << " value='" << current_token.value << "'" << std::endl;
+  // Check if the current token matches using Token::match method
+  if (expected_token.match(current_token)) {
+    // std::cerr << "DEBUG: Scanner - Match found!" << std::endl;
+    ParsingState new_state = state;
+    new_state.position_in_production++;
+    add_to_set(new_state, chart_index + 1);
+  } else {
+    // std::cerr << "DEBUG: Scanner - No match" << std::endl;
   }
 }
 
 void EarleyParser::completer(const ParsingState& state, std::size_t chart_index) {
-  if (true) {
-    // Find all states in S[state.start_token_index] that were waiting for this nonterminal
-    if (state.start_token_index < table.size()) {
-      const auto& start_chart = table[state.start_token_index];
-      for (const auto& waiting_state : start_chart) {
-        if (!is_finished(waiting_state)) {
-          auto next_symbol = next_element(waiting_state);
-          if (is_nonterminal(next_symbol)) {
-            Nonterminal expected_nonterminal = std::get<Nonterminal>(next_symbol);
-            if (static_cast<int>(expected_nonterminal) == state.nonterminal_type) {
-              ParsingState new_state = waiting_state;
-              new_state.position_in_production++;
-              add_to_set(new_state, chart_index);
-            }
+  // Find all states in S[state.start_token_index] that were waiting for this nonterminal
+  if (state.start_token_index < table.size()) {
+    const auto& start_chart = table[state.start_token_index];
+    for (const auto& waiting_state : start_chart) {
+      if (!is_finished(waiting_state)) {
+        auto next_symbol = next_element(waiting_state);
+        if (is_nonterminal(next_symbol)) {
+          Nonterminal expected_nonterminal = std::get<Nonterminal>(next_symbol);
+          if (static_cast<int>(expected_nonterminal) == state.nonterminal_type) {
+            ParsingState new_state = waiting_state;
+            new_state.position_in_production++;
+            add_to_set(new_state, chart_index);
           }
         }
       }
-    } else {
-      throw ParseError("Completer - state.start_token_index >= table.size()");
     }
+  } else {
+    throw ParseError("Completer - state.start_token_index >= table.size()");
   }
 }
 
